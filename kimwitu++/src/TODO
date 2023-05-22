@@ -1,0 +1,64 @@
+To Do (or: known bugs and planned features)
++ patterns for phyla, 'with' over abstract_phylum
++ clean up printer ( ... }<CR><TAB>... leads to too much whitespace )
++ allow constructors for list phylums
++ malloc
++ overlap checks
+
+Internal tracking:
+? still_unique probably broken
++ doc: '::'
++ generated prototypes have spurious spaces at end
+
+ - wrt the function argument declaration:
+      currently onlysimple arguments are allowed: plain types,
+      pointers and function pointers, but no arrays.
+      this should be more complete, probably also including ANSI C things
+      like const and volatile.
+ - wrt CSGIO error reporting:
+      keeping a line count, error rports should refer to the line in
+      the structure file where the error occured.
+ - wrt atomic (predefined) phyla:
+      allowing the user to specify own atomic phyla, in a way similar
+      as in the SG.
+
+
+* --no-linedirec makes no line direcs, add --lindirec-comment or such
+* try to warn about using the same pattern multiple times, better sorting
+* rename: KC_LANGUAGE -> is_language, KC_SET_LANGUAGE -> set_language, move KC_TEXT
+* think again about offsetlist and subphylalist (global? rather attribute)
+* get rid of kc_void_ptr
+* incorporate kc4.4->4.6 changes
+* make CSGIOread usable w/o type (fred::CSGI...)
+* remove longjmp in CSGIO
+* intialisation for non-static %attr; _no_ static %attr
+* %attr and %member must be attributes like the old-style ones for copy
+* make %attr and %member behave differently wrt CSGIO
+* remove GLOBAL_ATTRIBUTE_PATCH
+* YYSTYPE optional
+* kc_integer -> integer
+* integer value per macro
+* remove COPY_ATTRIBUTES
+* remove CREATE_ROUTINE
+* namespace
+* outmost patterns with conditions
+* phylum_cast
+* unparse(seemingly_old_printer_function, uview) in abstract_phylum
+* options for covariant return
+* kc_do_free_phylum: get rid of voidptr
+* should kc_CSGIOscan_{integer|real} still exist? NO!
+* get rid of all offset stuff (KC_OFFSET.., KC_SUBPHY...)
+* in kc_CSGIOread2dft: YYSTYPE.yt_voidptr assignments must cast to voidptr (but see below)
+* don't use YYSTYPE as often
+* enable NO_COVARIANT_RETURN
+* in kc_CSGIOwrite2structure: wrong casts from kc_p
+* in kc_CSGIOscan: cases are incorrectly indented
+* unparse needs printer_function instead of void(*)(char*, uview)
+* unparse templates (in k.h) must use printer_function
+- v_*_printer in error.k need to be printer_function
+* in v_file_printer: 4th arg must be const, accordingly where it is called
+* in kc_do_printdot_add_edge: cast to voidptr (but see below)
+* kc_do_print_phylum does not accept kc_void_ptr
+* kc_CSGIOscan takes kc_phylum* as second parameter
+* in kc_CSGIOscan, l. 12: add const_cast
+* in kc_CSGIOscan_{integer|real}, kc_CSGIOwrite2structure: add const (or c_) and const_cast for kc_p

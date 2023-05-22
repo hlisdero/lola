@@ -1,0 +1,143 @@
+# 
+# The Termprocessor Kimwitu++
+#
+# Copyright (C) 1991 University of Twente, Dept TIOS.
+# Copyright (C) 1999-2007 Humboldt-University of Berlin, Institute of Informatics
+# All rights reserved.
+#  
+# Kimwitu++ is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Kimwitu++ is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Kimwitu++; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+#
+#  
+# This is the makefile for kc++.
+#
+# Usage: make boot [ GENDIR=yourgendirpath ]
+#		will bootstrap kc++ in directory GENDIR, by default set to src/Gen
+#		(when using relative paths, relative to src)
+#
+# Usage: make distribution
+#		creates kimwitu*.tar.gz ready for distribution
+
+SHELL := /bin/sh
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+DESTDIR =
+bindir = $(DESTDIR)@bindir@
+mandir = $(DESTDIR)@mandir@
+
+ARCH := @arch@
+GENDIR := Gen
+@SET_MAKE@
+INSTALL = @INSTALL@
+UNIVERSAL_BINARY :=
+
+.PHONY: all boot distribution
+
+all: @srcdir@/src/Gen.boot boot
+
+boot:
+	cd src && \
+	$(MAKE) boot GENDIR=$(GENDIR) && \
+	cp $(GENDIR)/kc++ ..
+
+@srcdir@/src/Gen.boot:
+	@echo "Gen.boot doesn't exist."
+	@echo "This probably means you didn't unpack a Kimwitu++ distribution,"
+	@echo "but instead just got the source (from CVS, maybe). Please change into"
+	@echo "the src dir and run make there. You will need a running copy of kc++."
+	@false
+
+K_FILES := \
+	abs.X \
+	gen.X \
+	gutil.X \
+	error.X \
+	main.X \
+	occur.X \
+	parse.X \
+	pat.X \
+	util.X
+K_GENS  = unpk.X k.X rk.X
+K_SOURCE := $(K_FILES:%X=%k)
+K_CFILES := $(K_FILES:%X=%cc) $(K_GENS:%X=%cc)
+K_HFILES := $(K_FILES:%X=%h)  $(K_GENS:%X=%h)
+K_HFILES += yystype.h defs.h
+GETOPT_CFILES := getopt.h getopt.c getopt1.c
+FLEXBISONOUTPUT := kimwl.cc kimwy.cc kimwy.h kimwy.output errmsg.inc
+FLEXBISONFILES := kimwl.l kimwy.y
+ERRMSGFILES := errmsg.py
+AUXFILES := Makefile.in config.h.in TODO ChangeLog 
+VC7FILES := config.h kc.sln kc.vcproj
+
+ROOTFILES := Makefile.in configure.ac configure README INSTALL LICENCE COPYING AUTHORS CHANGES install-sh
+MANDIR := man/man1
+MANFILES := kc++.1
+DOCDIR := doc
+DOCSUB := doc/figures doc/formatters
+DOCFILES := kpp-main.xml kpp-intro.xml kpp-manual.xml kpp-cook.xml kpp-rpn.xml fdl.xml \
+	formatters/docbook2html.sh formatters/docbook2tex.sh formatters/docbook2tex.xsl \
+	$(patsubst doc/%,%,$(wildcard doc/figures/*.png) $(wildcard doc/figures/*.fig)) \
+	developers-reference.xml kc2kc++.tex Makefile
+
+DISTDIR := @PACKAGE_TARNAME@-@PACKAGE_VERSION@
+
+distribution dist:
+	@cd src && $(MAKE) distribution
+	@-rm -r $(DISTDIR)
+	@mkdirhier $(DISTDIR)/$(MANDIR)
+	@for i in $(MANFILES); do cp -p $(MANDIR)/$$i $(DISTDIR)/$(MANDIR)/$$i; done
+	@for i in $(DOCSUB); do mkdirhier $(DISTDIR)/$$i; done
+	@for i in $(DOCFILES); do cp -p $(DOCDIR)/$$i $(DISTDIR)/$(DOCDIR)/$$i; done
+	@mkdirhier $(DISTDIR)/src/Gen.boot
+	@for i in $(K_CFILES) $(K_HFILES) $(FLEXBISONOUTPUT); \
+	  do grep -v '^#line' src/$(GENDIR)/$$i > $(DISTDIR)/src/Gen.boot/$$i; done
+	@for i in $(K_SOURCE) $(FLEXBISONFILES) $(ERRMSGFILES) $(AUXFILES) $(GETOPT_CFILES); \
+	  do cp -p src/$$i $(DISTDIR)/src; done
+	@for i in $(VC7FILES); \
+	  do cp -p src/vc7/$$i $(DISTDIR)/src/vc7; done
+	@cp -p $(ROOTFILES) $(DISTDIR)
+	@tar cf - $(DISTDIR) | gzip -9 -c > $(DISTDIR).tar.gz 
+	@echo $(DISTDIR).tar.gz created
+
+install: boot
+	@INSTALL_PROGRAM@ kc++ $(bindir)/kc++
+	@INSTALL_DATA@ $(MANDIR)/kc++.1 $(mandir)/man1
+
+maintainer-release: dist
+	cd html && $(MAKE) VERSION=@PACKAGE_VERSION@ install
+	cd html && $(MAKE) PACKAGE=$(DISTDIR).tar.gz tar-install
+
+ifeq ($(ARCH),cross)
+maintainer-release-exe:
+	ln -s /tmp/kcwin/kc++ kc++-@PACKAGE_VERSION@.exe
+	cd html && $(MAKE) PACKAGE=kc++-@PACKAGE_VERSION@.exe tar-install
+endif
+
+clean:
+	cd src; \
+	$(MAKE) distclean
+	-rm kc++
+
+help:
+	@echo "You may call make with the following targets:"
+	@echo "   boot             (default) fresh from distribution"
+	@echo "   distribution     make a tar.gz for release"
+	@echo "   install          copy binary and man page to destination"
+	@echo "   clean            quite clean"
+	@echo
+	@echo "   maintainer-install      install into ~site/bin"
+	@echo "   maintainer-release      put release on web site"
+	@echo "   maintainer-release-exe  put .exe on web site"
+

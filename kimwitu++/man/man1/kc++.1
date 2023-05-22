@@ -1,0 +1,219 @@
+.TH KC++ 1 "January 2007" "Kimwitu++"
+.SH "NAME"
+Kimwitu++ \(en generate C++ code from Kimwitu++ input
+
+.SH "SYNOPSIS"
+.B kc++
+.IR "" [ options ] " \(file" ...
+
+.SH "DESCRIPTION"
+.B kc++
+reads the abstract syntax de\(finition, function de\(finitions,
+rewrite rules and unparse rules from the \(files given on the
+command line, or from the standard input if no \(file arguments
+were given. It generates for each
+.IB \(file .k
+input \(file a pair of
+.IB \(file .cc
+and
+.IB \(file .h
+\(files that contain the translation of the functions de\(fined in the
+corresponding
+.IB \(file .k \fR.
+.PP
+Additionally the following \(files are generated:
+.BR csgiok.{h,cc}   ", "   rk.{h,cc}   " and "   unpk.{h,cc}  ,
+that contain the CSGIO-, the rewrite- and the unparse-functions, respectively,
+and the
+.BR k.cc   " and "   k.h
+\(files that contain the grammar tables and the remaining `default' functions
+as well as the declaration of the classes for each phylum in the de\(finition
+of the abstract syntax.
+.PP
+If no command line \(file arguments are given, the translation of the
+user-de\(fined functions will be generated in
+.B stdin.{h,cc}
+\(files.
+.PP
+.B kc++
+does not unnecessarily overwrite a \(file: if a \(file would be overwritten
+with its own (identical) contents, it will not be touched.
+This makes it easy to write an e\(Ficient Make\(file.
+
+.SH "OPTIONS"
+.SS "KIMWITU++ FEATURES"
+.TP
+.BR -c   ", "   --no-csgio
+no read/write functions (csgio.{h,cc}) are generated.
+.TP
+.BR -r   ", "   --no-rewrite
+no code for rewrite rules (rk.{h,cc}) is generated.
+.TP
+.BR -u   ", "   --no-unparse
+no code for unparse rules (unpk.{h,cc}) is generated.
+.TP
+.BR -d   ", "   -no-printdot
+no printdot functions for printing dot-\(files (input for the graphviz
+package) are generated.
+.TP
+.BR -t   ", "   -no-hashtables
+no code for hastables is generated (works only when both
+.BR --no-csgio   " and "   --no-printdot
+are speci\(fied).
+.TP
+.B --operator-cast
+generate \fBoperatork.h\fR for operator_cast<>
+
+.SS "C++ COMPILER OPTIONS"
+.TP
+.BR -n   ", "   --covariant   "=\fIC\fR"
+use covariant return types; options are \fByes\fR (use them), \fBno\fR (don't
+use them, requires explicit casting), or \fBpre\fR (use preprocessor symbol
+NO_COVARIANT_RETURN to guard the de\(finitions).
+.TP
+.IR \fB--stdafx\fR [= FILE ]
+include for Microsoft precompiled header \(files is generated (default stdafx.h).
+.TP
+.BR -e   ", "   --dllexport  =\fISTRING\fR
+generates string between keyword class and the class name of all operators and
+phyla (used eg. for DLL export de\(finitions for Windows).
+.TP
+.BR -m   ", "   --smart-pointer
+generates code for smart pointers (does reference counting).
+.TP
+.BR -w   ", "   --weak-pointer
+generates code for weak pointers (implies \fB--smart-pointer\fR).
+
+.SS "OPTIONS FOR FILE GENERATION"
+.TP
+.BR -s   ", "   --suffix  =\fIEXT\fR
+extension for generated source \(files (default cc).
+.TP
+.BR -f   ", "   --file-prefix  =\fIPREF\fR
+pre\(fix for generated \(files.
+.TP
+.BR -o , " --overwrite"
+always write generated \(files even if not changed.
+.TP
+.BR -b ,
+.IR \fB--yystype\fR [= FILE ]
+generates \(file (default yystype.h) containg YYSTYPE
+for \fByacc\fR(1) or \fBbison\fR(1).
+.TP
+.BR -y , "--yxx-union"
+generates \(file yxx_union.h for yacc++.
+
+.SS "ADVANCED OPTIONS"
+.TP
+.BR -l   ", "   --no-linedirec
+does not emit line directives (`#line'). This is sometimes handy when you need
+to debug your program.
+.TP
+.B --comment-line
+prints line comments (`//line') instead of line directives. This may aid
+debugging when the bugs are not in your code but in Kimwitu++.
+.TP
+.B --dir-line
+prepends the current working directory to the \(file name in line directives.
+.TP
+.B --rw-loop
+generates a non recursive rewrite function.
+.TP
+.BR -p   ", "   --pipe =\fICMD\fR
+\(filter every input \(file through \fICMD\fR. The programm will be called as
+.IB "CMD \(file" .k
+and must deliver its output to standard output.
+
+.SS "GENERAL OPTIONS"
+.TP
+.BR -M   ", "   --msg-format =\fIPATTERN\fR
+speci\(fies format of (error) messages. The actual message is appended.
+\fIPATTERN\fR can contain:
+.IP
+ %p (program name)
+ %s (severity)
+ %f (\(file name)
+ %d (current working directory)
+ %l (line number)
+ %c (column)
+.TP
+.BR -q   ", "   --quiet
+be quite quiet about warnings etc., give only return status (not implemented).
+.TP
+.BR -v   ", "   --verbose
+print additional status information while processing.
+.TP
+.IR \fB-W\fR [ what ]
+enable all warnings; use comma-seperated list for
+detailed control (can be prefixed with `no')
+.IP
+ drop \(en dropped rule bodies (no code generated)
+ equiv \(en equivalent patterns (cannot match)
+ overlap \(en possibly overlapping patterns
+.TP
+.BR -h   ", "   --help
+give a short help message.
+.TP
+.BR -V   ", "   --version
+print the version number of \fBkc++\fR and exit.
+
+.SH "GENERATED FILES"
+.TP
+k.{h,cc}
+the grammar and default functions
+.TP
+rk.{h,cc}
+the rewrite view declarations and rewrite functions
+.TP
+csgiok.{h,cc}
+the CSGIO functions
+.TP
+unpk.{h,cc}
+the unparse view declarations and unparsing functions
+.TP
+\fI\(file\fR.{h,cc}
+translation of user-provided Kimwitu++ functions.
+.TP
+stdin.{h,cc}
+translation of user-provided Kimwitu++ functions if no command line
+\(file arguments were given.
+.TP
+yystype.h
+(or any other name you specify) the YYSTYPE union.
+.TP
+yxx_union.h
+the (anonymous?) union (for yacc++, apparently).
+
+.SH "DIAGNOSTICS"
+If an error is encountered in the Kimwitu++ input, an appropriate error
+message will be written on standard error, code generation
+will be suppressed and a non-zero exit value will be returned.
+The error messages should be self-explanatory.
+
+.SH "BUGS"
+The error messages are not always very self-explanatory. Sometimes
+\fBkc++\fR gets confused by parse errors.
+.br
+The option \fB-p\fR is a hack. Not much checking is done, no fault recovery.
+Don't interrupt \fBkc++\fR when piping, you will regret it.
+
+.SH "AUTHOR"
+.TP 3
+Kimwitu was written by
+Axel Belinfante, University of Twente, the Netherlands.
+.br
+.TP 3
+Kimwitu++ was written by
+Michael Piefel, Humboldt-Universit\(:at zu Berlin, Germany.
+
+.SH "REPORTING BUGS"
+Report bugs to <piefel@informatik.hu-berlin.de>; we'd also like to hear from
+you when you successfully use Kimwitu++ for your projects.
+
+.SH "COPYRIGHT"
+Copyright \(co 1998-2007 Michael Piefel, Humboldt-Universit\(:at zu Berlin
+.br
+Kimwitu++ comes with \fBno\fR warranty; for details see GPL.
+.br
+This is free software, and you are welcome to redistribute it under
+certain conditions; for details see GPL.

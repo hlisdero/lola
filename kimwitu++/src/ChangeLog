@@ -1,0 +1,1259 @@
+2007-01-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Darwin-Universal-Binary fertig
+
+2007-01-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Added universal binary support
+
+2007-01-18  Ralf Schuchardt  <schuchar@informatik.hu-berlin.de>
+
+	* .cvsignore, Makefile.in, abs.k, gen.k, kimwy.y, main.k:
+	* Makefile.in:
+	Don't use option -s while linking, as it may produce corrupted
+	executables on Macs.
+
+	* abs.k, kimwy.y:
+	Support for base class constructor calls with more than one argument.
+
+	* gen.k:
+	New function for creating phyla, using a vector instead of an argument list
+
+2003-11-20  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, gutil.k, kimwy.y, main.k:
+	Remove a couple of evil C string functions.
+
+2003-10-27  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* ChangeLog: New version 2.3.8
+
+	* gen.k, ChangeLog:
+	Fix a nasty little bug on architectures without wstring. That wouldn't be
+	standards compliant, but so what. Since we usually don't even need wstring,
+	move the usage into the part in ifdef.
+
+2003-10-23  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Fix dep again. Not my day.
+
+	* Makefile.in: Revert last change, correct dependency instead.
+
+	* Makefile.in:
+	Also copy defs.h from Gen.boot to make make possible. This cannot have been
+	possible before. I wonder...
+
+2003-10-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in:
+	Change order of files; this usually means that unpk.cc and such will be
+	compiled first. This is helpful in parallel builds, where up to now all
+	the tiny files were compiled in parallel, but the (usually long) unpk.cc
+	was compiled last and alone.
+
+	* main.k, gen.k: Add option to generate operator_cast<>() functions.
+
+2003-10-15  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwy.y, abs.k, gen.k: Implement new "named subphyla" feature.
+
+2003-09-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* parse.k, pat.k, gutil.k, main.k, abs.k, error.k, gen.k:
+	New option "-W" and suboptions for dropped/overlapping patterns warnings
+
+2003-09-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Beautify Gerd's rewrite-loop function.
+
+2003-09-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k:
+	Change printer to make Gerd's last change work for longer input lines.
+
+2003-09-10  Gerd Kurzbach  <kurzbach@iti.de>
+
+	* main.k, gutil.k, kimwy.y, gen.k, abs.k: rw-loop and small fixes
+
+2003-08-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwy.y:
+	Repair the error reporting to work with bison 1.875a again (Toby's patch).
+
+2003-08-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in, errmsg.py, kimwy.y:
+	Repair the error reporting to work with bison 1.875a.
+
+	* ChangeLog: Fix tab
+
+2003-08-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k, kimwy.y, main.k, getopt.c, getopt1.c, gutil.k, kimwl.l, gen.k, Makefile.in, TODO, abs.k, error.k:
+	Removed backticks in favour of ASCII apostrophe as single upright quotes
+
+2003-07-03  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Move -s to g++ guess section
+
+	* gen.k: Remove some evil semicolons
+
+	* ChangeLog: New version 2.3.5
+
+2003-06-13  Gerd Kurzbach  <kurzbach@iti.de>
+
+	* gen.k:
+	Several fixes: partial wide-character support, smart-pointers etc.
+
+2003-06-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k: Formatting
+
+	* main.k: Correct multi-line string in help
+
+2003-06-02  Gerd Kurzbach  <kurzbach@iti.de>
+
+	* error.k, main.k: USER: New options for error reporting format
+
+	* util.k: USER: Allow {con,de}structors for any class (but give warning)
+
+2003-05-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k, occur.k, pat.k, util.k, gen.k:
+	Add better check (and warning) for outmost predicates (eg. v=Foo(v, *)).
+
+2003-01-12  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in, main.k: The year is 2003, the name of the place is ...
+
+2003-01-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* occur.k, parse.k, pat.k, util.k, gutil.k, kimwl.l, kimwy.y, main.k, Makefile.in, abs.k, errmsg.py, error.k, gen.k:
+	Add full GPL comment.
+
+2002-11-21  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwy.y, main.k, gen.k:
+	Reintroduced option to change line directives into comments.
+
+2002-11-13  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* python.cc: Add myself.
+
+	* gen.k: Generate YYSTYPE define needed for bison >1.50.
+
+2002-11-01  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Fix VC6 issues (can't delete const char* and _stricmp doesn't exist).
+
+2002-10-09  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* ChangeLog: New version 2.3.1.
+
+	* Makefile.in, gen.k:
+	USER: Implement questionable ;-) version numbers in generated code.
+
+	* gen.k:
+	USER: Rename kc_.views to .views (should have happened before).
+
+	* error.k, gen.k: This time really (?) make k.h independent of unpk.h.
+
+2002-10-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: This time really (?) make k.h independent of unpk.h.
+
+2002-10-08  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Refrain from including unpk.h and rk.h in k.h.
+
+2002-10-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k, gen.k: Cleaned up some stack access functions.
+
+2002-09-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k: Cleaned up some stack access functions.
+
+	* gen.k:
+	USER: Added a virtual default_unparse method to have replaceable default
+	unparse behaviour. There is not yet a Kimwitu++ syntax extension for it.
+
+2002-09-10  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in:
+	Finally tackled bug 205: Can build in any dir with freshly checked out sources.
+
+2002-09-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, gen.k: Add missing phylum_sel_ definitions for list phyla.
+
+2002-09-03  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Finally fix printdot newline bug; it was incorrectly merged in from
+	Kimwitu 4.6, and had been buggy ever since.
+
+2002-08-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l:
+	Set never-interactive: it's true, and it avoids the need for isatty.
+
+	* gen.k: Changed condition from _WINDOWS to _AFX for MFC parts.
+
+	* main.k, Makefile.in, TODO, error.k, gen.k:
+	New views now only go to {unp,r}k.h, not k.h.
+	Restyled --no-linedirec option to really not emit any line directives.
+
+---
+2002-08-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l:
+	Set never-interactive: it's true, and it avoids the need for isatty.
+
+	* gen.k: Changed condition from _WINDOWS to _AFX for MFC parts.
+
+	* main.k, Makefile.in, TODO, error.k, gen.k:
+	New views now only go to {unp,r}k.h, not k.h.
+	Restyled --no-linedirec option to really not emit any line directives.
+
+2002-08-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Added some comments, removed unused constants.
+
+	* kimwl.l: Fixed some whitespace problems.
+
+2002-08-17  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* vc7/kc.vcproj: Fix nodebug options.
+
+	* vc7/config.h, vc7/kc.sln, vc7/kc.vcproj: Add VC7 project files.
+
+2002-08-08  Harald Böhme  <boehme@informatik.hu-berlin.de>
+
+	* gen.k:
+	Change back the semantic of append to return the old last element.
+
+2002-07-31  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Fixed bug when provided and common subterms appear both (and thus
+	PRUserPredicate is not the last in the list).
+
+2002-07-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Fixed missing covariant endif.
+
+	* main.k: Added option check for covariant.
+
+2002-06-27  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* occur.k, util.k: Added check for extension of non-existant phyla.
+
+2002-06-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in:
+	New Makefile magic: simpler, more robust (hopefully) for remote dirs.
+
+2002-06-24  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Combined Cons and Nil in rewrite; also suppressed superfluous test for default case.
+
+	* pat.k, util.k, gen.k:
+	Cleaned up source a little to make those new overlap warnings disappear.
+
+	* pat.k: USER: Pattern overlap check. Added silencable warnings.
+
+2002-06-20  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* pat.k:
+	Now properly implemented a first version of pattern overlap detection.
+
+	* gutil.k, main.k, gen.k, error.k:
+	Fixed some signed<->unsigned bugs (size_t).
+
+	* main.k: Really interpret stdafx now; warn for empty dllexport.
+
+	* kimwl.l:
+	Added warning for specifying yystype both on command line and in input.
+
+2002-06-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Some TRACE macros now get this instead of shallow copy, dropped responsible view.
+
+	* main.k, pat.k: Added overlap checks for rewrite and unparse rules.
+
+	* gutil.k, gen.k:
+	Renamed some functions and dropped f_rewriterulesinfoofalternatives.
+	Moved AcAbsdecl* unparse rules into another view (collision).
+
+	* util.k: Whitespace changes.
+
+2002-06-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* pat.k, util.k:
+	Added first simple version of check_patterns function, which is meant to
+	check for overlapping patterns; only for equivalent with-patterns ATM.
+
+	* gutil.k, gen.k:
+	Renamed my_rewrite_withcasesinfo to rewrite_withcasesinfo.
+
+2002-06-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, util.k, gutil.k, kimwy.y: Minor code clean-up.
+	Report only one parse error per file as our stabilization is unusable.
+
+	* pat.k: Massive code clean-up to better understand pattern sorting.
+
+2002-06-12  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Added hash_set support for g++ 3.1
+
+	* parse.k, pat.k, python.cc, util.k, Makefile.in, abs.k, error.k, kimwl.l, occur.k:
+	Bumped year; removed remaining lint/SABER references.
+
+	* kimwl.l: Made remaining %-keywords start at start-of-line
+
+	* gen.k: Trashed superfluous argument to subphylum
+
+2002-06-03  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* abs.k, occur.k, parse.k, pat.k:
+	Added many with-functions and multi-patterns.
+
+	* main.k: Reordered option help to allow for extensions (later).
+
+	* gen.k: Removed superfluous uview declarations.
+
+2002-05-30  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Added this-> to variable bindings to prevent initialization with itself.
+
+2002-05-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Fixed some unused and some shadowing variables.
+
+2002-05-16  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: Bumped year.
+
+2002-05-15  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Generate deprecated kc_tag_ defines.
+
+	* gen.k: Emit KC_DEPRECATED block.
+
+2002-05-15  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Again language-macro-names, changed last two occurences, this time I tested it!
+
+2002-05-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Updated rewrite pattern unparsing to new 'provided' handling.
+	Fixed SF#177 - subphylum test in ?: in rewrite.
+
+2002-05-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, gen.k:
+	Changed language-macro-names (lower case - might not be macros in the future, no KC_
+	prefix), moved KC_TEXT in unpk.h to LANG_TEXT in unpk.cc.
+
+	* TODO, ChangeLog, pat.k: Beautify, extend...
+
+2002-05-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: Really added --quiet option.
+
+	* gen.k:
+	Made append return correct list, introduced iterative do_append.
+
+2002-05-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k, main.k, parse.k, pat.k, gen.k, TODO:
+	Removed several kc_ prefixes; renamed kc_tag_ to impl_.
+	Moved PRUserPredicate to end of pattern list (may influence ordering).
+	Code beautification: indentation, with-functions etc.
+
+	* kimwy.y: Some indentation.
+
+2002-04-30  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Remove print call.
+
+2002-04-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l, kimwy.y: Fixed line number for includes bug.
+
+2002-04-24  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Improved const support in CSGIO (should work with gcc3 now).
+
+2002-04-05  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* config.h.in, Makefile.in, python.cc: Add --with-python.
+
+2002-04-04  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* Makefile.in, python.cc, python.h: Make python.cc compile again.
+
+2002-04-03  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* Makefile.in: Use LC_ALL, not LANG.
+
+2002-04-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* python.cc, python.h, gen.k: Excised is_list.
+
+2002-03-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* TODO: Tidied up.
+
+2002-03-15  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* parse.k, gutil.k, gen.k, error.k:
+	Make mkcasestring copy the string only when it is actually required.
+
+2002-03-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l, main.k: Some changes for Visual C++
+
+	* Makefile.in: What are these empty lines for?
+
+	* Makefile.in: *** empty log message ***
+
+	* kimwy.y, main.k, Makefile.in: Some changes for Visual C++
+
+2002-02-26  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l, kimwy.y, parse.k, abs.k, error.k, gen.k:
+	Removed NL line count where count was always 1.
+
+2002-02-25  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l, kimwy.y, util.k, abs.k, gen.k:
+	Allow conversion operators in phyla.
+
+	* occur.k: Space.
+
+	* parse.k: Dead code. Dead code?
+
+2002-02-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l: Allow "arbitrary" operators, IOW conversion operators.
+
+	* Makefile.in: Finally adapt to new errmsg.py.
+
+2002-01-03  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Short bad, long good.
+
+2001-12-20  Martin von Loewis  <loewis@informatik.hu-berlin.de>
+
+	* errmsg.py, kimwy.y, Makefile.in:
+	Use compact representation of error rules.
+
+2001-12-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* errmsg.h, errmsg.pl, errmsg.py, kimwy.y, Makefile.in:
+	Replaced perl by python script and dropped errmsg.h .
+
+	* bisonsim.msg, bisonsim.rec, kimwy.y, Makefile.in:
+	Skeletons obsoleted.
+
+	* kimwl.l: Delete superfluous definition of yyrestart.
+
+	* kimwl.l, kimwy.y: Moved yyerror from kimwl.l to kimwy.y
+
+2001-12-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* bisonsim.msg, Makefile.in: Adapted to newer bison.
+
+	* occur.k: Removed "inline"
+
+	* kimwy.y, parse.k, util.k: Changed includes to occur.h
+
+2001-12-17  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in, defocc.k, extocc.k, occur.k, useocc.k:
+	Moved contents of *occ.k to occur.k.
+
+2001-12-05  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k, gen.k:
+	Added assertions for creation of phyla: Correct subphyla.
+
+2001-11-30  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, kimwl.l, kimwy.y, abs.k: Fixed YYLMAX limit.
+
+2001-11-21  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Added size attribute to KC_OPERATOR_INFO to allow KC_STATISTICS.
+
+2001-11-20  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Fixed list constructors in presence of additional members.
+	Made additional members possible for primitive phyla.
+
+	* gen.k, gutil.k, main.k, parse.k, pat.k, useocc.k, util.k:
+	Many small fixes, mostly cast-related.
+
+	* getopt.h:
+	Fixed fucked up prototype for getopt() (removed declaration).
+
+	* abs.k: Removed INC2 macro, replaced by simple new data type.
+
+2001-11-16  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Generate (almost) empty attributOf function if there are no attributes.
+
+	* gen.k: Made printer_functor_class as empty as it should be.
+
+2001-11-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Fixed line ending (forgot to escape backslash).
+
+	* gen.k: Recognize more compilers to automatically use hashsets.
+
+	* gen.k:
+	Removed superfluous underbar in output (for abstract_phylum members).
+
+2001-11-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* config.h.in, Makefile.in: Add detection for hashsets.
+
+	* gen.k:
+	Now generating hash_set for casestring (optionally, using preproc).
+	Also initial (and usually only) "hashtable" will be cleared in one go.
+
+2001-11-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Uniq phyla are now in seperate sets: One for each predefined and one for
+	all the others. Simplified compare function speeds up casestring creation.
+
+2001-11-05  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Another one of those giant lists unparsed iteratively. Now files can be large.
+
+	* util.k: Typo: Left a closing brace in...
+
+2001-10-30  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, util.k:
+	Lists are now by default unparsed and reversed iteratively.
+	Avoided some unnecessary recursion to let kc++ work on very large files.
+
+	* error.k: Code beautification.
+
+2001-10-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k:
+	Call do_unparse instead of unparse in list unparsing default case to reduce
+	call depth for non-optimizing compiler (just to go sure).
+
+2001-09-21  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Unvirtualize free (really this time).
+	Simplified phylum_less. This also makes it correct (it was using a deleted
+	object before which only became apparent with Intel's icc).
+
+2001-09-20  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, gen.k:
+	Finally got completely rid of kc_nullary. Removed storage class from
+	operator info, as it's the same as the class for the phylum.
+
+	* kimwl.l: Nicer warning message for nested C inludes.
+
+	* ChangeLog: Correct Martin's name (oe -> ö).
+
+2001-09-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* extocc.k, gen.k, kimwl.l, kimwy.y, util.k:
+	Added warning for possibly nested '%{' '%}'.
+
+2001-08-24  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Allow inititializers for %member.
+	Reorder inititializations.
+	Some code beautification.
+
+	* kimwy.y: Allow initializers to take either '= ...' or '(...)' form.
+
+	* main.k: Stupid typo (hastables again)
+
+2001-08-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k: Fix for MacOS X
+
+	* gen.k: Fix inverted order for initializing user-supplied attributes
+
+2001-08-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* getopt.h:
+	Updated to newer LGPL. Renamed mysterious __arg? parameters.
+
+	* main.k: Fixed option typo
+
+2001-07-03  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* config.h.in, Makefile.in:
+	Added check for string.h; makes cross-compiling work.
+
+2001-06-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in: Forgot to include getopt in dist...
+
+2001-06-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* getopt1.c, main.k, getopt.c, getopt.h, Makefile.in:
+	Added getopt, option parsing now more stable
+
+2001-05-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* config.h.in, Makefile.in: Changed to new autoconf version (2.50)
+
+2001-05-16  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Fixed stupid printf typo (%p instead of %x)
+
+	* gen.k, main.k:
+	Accidentally generated #include "config.h" into the code...
+	Some all-public classes converted to structs.
+
+2001-05-11  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, main.k: Rearranged some include statements
+
+	* Makefile.in: Removed kimwy.hh from dist targets
+
+2001-05-10  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k: Changed some namespace std names to work with old g++
+
+	* kimwl.l: Altered option parsing
+
+	* TODO: DONE
+
+	* gen.k: Added NORETURN, fixed ::unparse (namespace error).
+
+2001-04-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k: Fixed missing ctype-include (became obvious only with g++3)
+
+2001-03-15  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in:
+	Fixed wrong use of @srcdir@ which prevents from just making boot.
+
+2001-03-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile.in:
+	Made 'make distribution' work better, now works completely in Gen-dir.
+
+	* gen.k: Removed the assert_<phylum> macros.
+
+	* defocc.k, useocc.k: Changed copyright notice.
+
+	* Makefile.in: More autoconf; can compile with remote configure.
+
+2001-03-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, Makefile, Makefile.in, patchlvl.h:
+	Applied autoconf to everything - not much done, but a start.
+
+2001-03-12  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k:
+	Fixed stupid bug in compare_and_delete_or_move where closed files were
+	touched again; changed some error messages.
+
+	* gen.k: Removed a debugging message.
+
+2001-03-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k, kimwl.l, kimwy.y, main.k, parse.k, pat.k, useocc.k, util.k, abs.k, defocc.k, error.k, extocc.k, gen.k, Makefile:
+	Merged in changes which occured from kimwitu 4.4 -> 4.6.
+
+2001-03-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k:
+	Fixed bad namespace error (including headers with anonymous namespace...)
+
+	* Makefile: Made make distribution work without bison etc. (Finally!)
+
+2001-03-05  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: Changed copyright year in version output.
+
+	* patchlvl.h:
+	CSGIO has no return values anymore, template for read function.
+
+	* gen.k:
+	CSGIO has no return values anymore, template for read function, changed
+	a couple of names.
+
+2001-03-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, gen.k, TODO:
+	Removed longjmps in CSGIO, now throwing exceptions instead.
+
+2001-02-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, patchlvl.h, util.k, error.k, gen.k, gutil.k, kimwy.y, Makefile, TODO:
+	Defining %attr, initializing it and read/write (CSGIO) should now work.
+
+2001-02-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* .cvsignore: Added cscope.out.
+
+	* gen.k, gutil.k, TODO:
+	Better csgio with (null pointer), begin to code %attr initialisation.
+
+	* util.k: Layout; added better checks for %attr.
+
+	* error.k: Layout; better TAB output.
+
+	* abs.k: Layout only.
+
+2001-02-21  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k: Added check for static %attr.
+
+	* kimwl.l:
+	New code for // was broken, didn't allow comments in outer scope.
+
+	* abs.k, error.k, gen.k, gutil.k, kimwl.l, kimwy.y, main.k, Makefile, parse.k, patchlvl.h, TODO, useocc.k, util.k:
+	Made %attr and %member more useful: write %attrs in CSGIO.
+
+2001-02-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, main.k, parse.k, patchlvl.h, pat.k, TODO, util.k:
+	Removed COPY_ATTRIBUTES, introduced copy_attributes instead.
+
+	* Makefile: Use c++ instead of g++ now.
+
+2001-02-05  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: Options --version and --help now more GNUish.
+
+2001-02-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* abs.k, defocc.k, error.k, extocc.k, gen.k, gutil.k, kimwl.l, kimwy.y, main.k, Makefile, parse.k, patchlvl.h, pat.k, TODO, useocc.k, util.k:
+	Removed CREATE_ROUTINE (use kc_create instead) and introduced namespace kc.
+
+2001-02-01  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile: Better optimisation options in view of different compilers.
+
+2001-01-17  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* kimwl.l: Added %option to specify options within .k files.
+
+	* gen.k:
+	Added do_unparse to finally solve the printer_function/functor
+	problem.
+
+	* util.k: Formatting only
+
+2000-12-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, kimwl.l: Little mistake.
+
+	* pat.k, util.k, bisonsim.msg, error.k, gen.k, gutil.k, kimwl.l, main.k, Makefile:
+	Changes to be more standard conformant and less memory leaking.
+	(IOW: Used Sun CC and Purify.)
+
+2000-12-15  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, parse.k, patchlvl.h, pat.k, gutil.k, kimwl.l, kimwy.y, bisonsim.msg, errmsg.h, errmsg.pl, error.k, gen.k, Makefile:
+	Many changes to compile without warnings on Sun CC, meaning it should be
+	much better ISO C++ now.
+
+2000-12-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Changed a 'new' in 'kc_grow_malloc_area'; and layout.
+
+	* main.k:
+	Changed mktemp to mkstemp (linker warning! they're getting too clever...)
+
+	* util.k, kimwy.y: Just layout
+
+	* cr_explore.py: Added copyright notice
+
+2000-12-04  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h: Version 1.3.5
+	* Makefile, abs.k, error.k, gen.k, gutil.k, kimwy.y, main.k, parse.k, pat.k, util.k:
+	Gerd's changes once more. This time it's the smartpointer implementation,
+	I believe. Also made rviews compatible with uviews, I think.
+
+2000-11-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* TODO, patchlvl.h: Version 1.3.4
+	* gen.k: Added uview declarations
+	* main.k: Tidied up some comments
+
+2000-10-19  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* TODO, error.k, gen.k, gutil.k: Added new unparse method taking a
+	function (not a function object), as before.  New signature with
+	uview - which is a new type, but with the old name... Renamed
+	KC_Printer->printer_functor_class,
+	printer_function->printer_functor and
+	old_printer_function->printer_function
+
+2000-10-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, main.k: Added option '--covariant' to allow:	- using
+	covariant return types (only)	- avoiding them completely   -
+	generating both to choose with NO_COVARIANT_RETURN (as before)
+
+2000-06-09  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* kimwl.l: Remove unnecessary backslashes in before % character
+
+2000-05-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Changed indentation for some private: labels and such.
+
+2000-05-22  Gerd Kurzbach  <kurzbach@iti.de>
+
+	* main.k: WIN32 -> ARCH = cygwin option -d= renamed in -e=
+	* gen.k: typedef const uview_class& c_uview;
+	const uview -> c_uview
+	using namespace std; in k.cc after #include <string>
+	freeallnullary() in k.h removed
+	in fprint_list kc_i removed
+	* kimwyl.l: ^ before %uviewvar and %rviewvar removed
+	
+2000-05-16  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* patchlvl.h: Release 1.3.3
+
+	* gen.k, gutil.k:
+	Don't use kc_uniq_nullary_operator storage class anymore
+	Remove f_no_attrs_in_Ccode_option, f_no_attrs_in_phylumdecl,
+	f_no_attrs_in_operatordecl
+
+2000-05-12  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k, main.k:
+	Fixed name mangling (magically replacing "rk.cc" by "->.cc" and such).
+
+2000-05-09  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h, TODO, gen.k: Formatting.
+
+2000-05-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k, gutil.k, main.k: 'provided' improved (now flawless?).
+
+2000-05-05  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gutil.k, patchlvl.h, gen.k:
+	User predicates can now use variables from patterns (does not yet always work).
+
+	* Makefile: Made boot target smaller (-Os -s).
+
+	* main.k:
+	Changed signal hanmdling (SIGSYS not defined on some systems).
+
+2000-05-02  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h, gutil.k, kimwl.l, kimwy.y, pat.k, util.k, TODO, abs.k, gen.k:
+	Added support for guards in all patterns: unparse, rewrite, with and foreach;
+	using keyword 'provided'.
+
+2000-05-01  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: Even more verboseness (works quite well now).
+
+2000-04-30  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* Makefile, gen.k: Phyla with no arguments are not uniq, anymore.
+
+2000-04-30  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k: A little more verboseness for --verbose.
+
+2000-04-18  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* Makefile: Rename kc++ to kc++-alpha for development branch
+
+2000-04-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, Makefile, gen.k: Made cross-compilation for Win NT possible.
+
+	* patchlvl.h, gen.k: Greatly improved 'print'ing of lists.
+
+2000-04-14  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* patchlvl.h: Release 1.2.2.
+
+	* gen.k: Fix KC_STATISTICS support.
+
+2000-04-13  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Use is_nil in list::append correctly.
+
+	* ChangeLog: Merge changes up to 1.2.1
+
+	* patchlvl.h: Release version 1.2.1
+
+	* gen.k: Remove Delete method
+	Change return type of abstract_list::copy to abstract_phylum
+
+	* Makefile, gen.k: Remove csgiok.* from set of generated files.
+	Change kc_uviews::view to a pointer type.
+
+2000-04-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h: Release version 1.2.
+
+	* util.k, abs.k, error.k, gen.k, gutil.k, kimwy.y, pat.k, patchlvl.h:
+	Renamed KC_UView and uview to uview_class and uview_enum, introduced
+	uview as uview_class&.
+	Improved rewrite rules syntax (quotes, arrows).
+
+	* main.k: Changed option names.
+
+	* Makefile:
+	KC++ now by default made quite small (no CSGIO, no printdot).
+
+2000-04-13  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Move CSGIOwrite function into base class
+	Implement CSGIOwrite using <map> instead of kc hashtables
+	Remove usage of YYSTYPE in csgio
+
+2000-04-12  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* Makefile, gen.k: Remove support for non-sharing csgio
+	Rename cygwin_{nt|98}-[45].0 to cygwin
+
+	* gen.k: Introduce is_nil method on lists.
+
+2000-04-11  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* patchlvl.h: Release version 1.1.1
+
+	* main.k, error.k, gen.k: Implement set_subphylum method
+	Do not generate subphylum if there are no subphyla
+	Maintain non-leading spaces in pretty printer
+
+	* gen.k: Move subphyla rewriting out of each view case; fix
+	double-rewriting of subphyla
+
+2000-04-08  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Rename kc_view_count to kc_last_uview; add kc_last_rview
+
+2000-04-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* gen.k: Removed some list bugs.
+
+2000-04-07  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* ChangeLog: New file
+
+	* patchlvl.h: Release version 1.1
+
+	* gen.k:
+	Rename kc_view_names to kc_uviews; add reference to view objects.
+
+	* gen.k, gutil.k, kimwy.y, main.k, parse.k: Merge with no_union branch
+
+	* gen.k: Fix remaining use of do_printdot_phylum
+
+	* gen.k: Remove KC_OFFSETOF, KC_SUBPHYLUM data structures,
+	use abstract_phylum in printdot functions instead of YYSTYPE
+
+2000-04-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile, gen.k: Removed nasty SIGSEGV caused by uninitialized
+	global (make a mental note: shouldn't use that anymore). Removed
+	purelink reference in Makefile.
+
+2000-04-07  Harald Boehme  <boehme@informatik.hu-berlin.de>
+
+	* gen.k: remove assert_.. in unparse() and rewrite()
+	change ...::append() to return the 2nd lastliste phylum
+
+2000-04-07  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k: Change map and filter to work without OperatorInfo.
+
+2000-04-05  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* kimwy.y, parse.k, Makefile, gen.k, gutil.k:
+	Removed u. access in kc++ itself
+	Fixed various newlist problems
+
+	* main.k, Makefile, gen.k: Removed union
+	Removed subclasses for lists
+
+2000-04-03  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* parse.k, useocc.k, util.k, abs.k, defocc.k, error.k, extocc.k, gen.k, main.k:
+	Remove bigatoms support
+
+2000-04-02  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gen.k, main.k: Unvirtualize eq and free
+
+	* main.k, gen.k: Unvirtualize print and list functions
+	Add virtual subphylum method
+
+2000-04-01  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* util.k, Makefile, error.k, gen.k, gutil.k, main.k, parse.k, pat.k:
+	Remove HPUX support
+	Remove LINT support
+
+	* main.k, parse.k, pat.k, useocc.k, util.k, Makefile, abs.k, defocc.k, error.k, extocc.k, gen.k, gutil.k, kimwy.y:
+	Remove casts and unparse pseudo casts
+	Remove SUPPRESS directives
+	Unprotect cvs id from lint/SABER
+
+	* abs.k, gutil.k, kimwy.y, main.k, util.k:
+	Replace kimwitu list stacks with STL stacks.
+
+2000-03-31  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* abs.k, main.k, util.k: Removed spaces and comments.
+
+	* gutil.k, kimwl.l, kimwy.y, main.k, parse.k, util.k, Makefile, abs.k, defocc.k, error.k, gen.k:
+	Gerd's newest patches, including C++ operators and overloading.
+
+2000-03-29  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k, bisonsim.msg, error.k, gen.k, gutil.k, parse.k, python.cc:
+	Renamed assert to assertCond to avoid name clash w/ std macro.
+
+2000-03-28  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* gutil.k, kimwl.l, kimwy.y, main.k, parse.k, patchlvl.h, util.k, Makefile, abs.k, defocc.k, error.k, gen.k:
+	Recover to kimwitu 1.01 after CVS repository loss
+
+1999-11-12  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k, util.k, TODO, gen.k:
+	Beginning to get rid of 'u'. This version does not work. Use yesterday's.
+
+	* kimwy.y: Formatting.
+
+	* .cvsignore: Ignored more.
+
+1999-11-10  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* main.k:
+	Fixed leave-with-fatal-bug (would recursively call leave from v_report).
+
+	* error.k, kimwy.y: Code layout change (indentation).
+
+	* kimwl.l: Allow '::' in identifiers.
+
+	* gen.k: Fixed operator statistics output (size of ops).
+
+	* Makefile: Fixed kimwy.o's dependency.
+
+1999-11-08  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* error.k, gutil.k, main.k:
+	No more g++ errors and warnings (now really).
+
+	* errmsg.pl: Stabilized for different bison versions ('"' vs. '\"')
+
+	* kimwy.y:
+	Stabilized parser a little for old-style function definitions.
+
+	* python.k, util.k, kimwy.y, main.k, patchlvl.h, python.cc, python.h, Makefile, TODO, bisonsim.msg, cr_explore.py, errmsg.pl, error.k, gen.k:
+	No more g++ errors and warnings (in none-permissive mode)
+
+1999-11-05  Martin von Löwis  <loewis@informatik.hu-berlin.de>
+
+	* kimwy.y: Work around gcc incorrectly instantiating relops::operator>
+
+	* main.k: implement -s
+
+	* Makefile: switch to g++
+
+	* error.k, gutil.k: using std::string
+
+	* pat.k: Work around gcc incorrectly instantiating relops::operator>
+
+1999-10-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* cr_explore.py, python.k: simplify
+
+1999-10-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile: Same again. Was not perfect yet.
+
+	* Makefile:
+	Changes to work in Linux and Others: find right 'kc++[.s0]' via 'type'.
+
+1999-10-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* python.k, Makefile: This version will break gdb on solaris.
+
+	* gen.k: add NO_COVARIANT_RETURN
+
+	* abs.k: remove newinclude
+
+1999-06-04  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* TODO: remove rewrite comment
+
+1999-05-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile: *** empty log message ***
+
+1999-05-10  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* LICENSE, Makefile, main.k:
+	Made distribution and boot make targets sensible. Changed licence.
+
+1999-05-07  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* Makefile: Nothing changed much. Beginning to GPL everything.
+
+1999-02-18  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h: *** empty log message ***
+
+	* Makefile: Kappa delivered.
+
+	* python.k, main.k, Makefile, gen.k:
+	Extensively tested. GLOBAL_ATTRIBUTE_PATCH works.
+
+1998-12-28  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* python.k: "No more bugs!" kc++ finally written in kimwitu++ again.
+
+	* util.k: remove casts
+
+	* main.k, pat.k, patchlvl.h:
+	"No more bugs!" kc++ finally written in kimwitu++ again.
+
+	* parse.k: Work around gcc incorrectly instantiating relops::operator>
+
+	* gutil.k, kimwy.y:
+	"No more bugs!" kc++ finally written in kimwitu++ again.
+
+	* kimwl.l: *** empty log message ***
+
+	* abs.k, error.k, gen.k:
+	"No more bugs!" kc++ finally written in kimwitu++ again.
+
+	* extocc.k: Work around gcc incorrectly instantiating relops::operator>
+
+	* Makefile: "No more bugs!" kc++ finally written in kimwitu++ again.
+
+1998-12-22  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* python.k, gutil.k, main.k, gen.k:
+	Disentangled rewrite; debugged with. Next: make stage 2.
+
+1998-11-20  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k, kimwy.y, main.k, parse.k, gen.k, Makefile, abs.k:
+	Disentangled the unparse functions. Next step: same for rewrite.
+
+1998-10-23  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* parse.k, python.k, util.k, gutil.k, kimwy.y, main.k, gen.k, abs.k:
+	Alternative contains superfluous id entry just introduced, removal
+	possibly tricky.
+
+	* CHANGES, Makefile, README: Cleaning up src dir.
+
+1998-10-14  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* python.k, main.k, gen.k, Makefile:
+	Renamed kc_double to kc_real. Going to remove K&R now.
+
+1998-10-13  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* cr_explore.py, python.k: Pyhton support for the Explorer feature.
+
+1998-09-25  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* pat.k, patchlvl.h, util.k: Reasonably stable. No constr & destr yet.
+
+	* useocc.k: reformat
+
+	* gutil.k, main.k, parse.k: Reasonably stable. No constr & destr yet.
+
+	* errmsg.h: *** empty log message ***
+
+	* error.k, extocc.k, gen.k, Makefile, abs.k:
+	Reasonably stable. No constr & destr yet.
+
+	* defocc.k: reformat
+
+1998-06-04  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* useocc.k, util.k, pat.k, patchlvl.h, main.k, parse.k, kimwy.y, gutil.k, kimwl.l, gen.k, extocc.k, defocc.k, error.k, Makefile, abs.k:
+	First Kimwitu++ version written in Kimwitu++
+
+1998-03-27  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* useocc.k, util.k, pat.k, patchlvl.h, parse.k, kimwy.y, main.k, gutil.k, kimwl.l, gen.k, extocc.k, defocc.k, error.k, Makefile, abs.k:
+	creates classes now
+
+1998-02-06  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* useocc.k, util.k, pat.k, patchlvl.h, main.k, parse.k, kimwl.l, kimwy.y, gutil.k, gen.k, extocc.k, defocc.k, error.k, Makefile, abs.k, CHANGES:
+	K&R support removed now, beginning to convert to class structure
+
+1998-01-09  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h, util.k, parse.k, pat.k, main.k, kimwy.y, gutil.k, kimwl.l, gen.k, error.k, Makefile:
+	No new features. I'm going to remove K&R support now. This version
+	still has it. The next won't.
+
+1997-12-09  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* util.k, pat.k, patchlvl.h, parse.k, kimwy.y, main.k, kimwl.l, gutil.k, gen.k, Makefile, error.k:
+	First version to get through a C++ compiler. 'Cleaned up' make file.
+
+1997-11-21  Michael Piefel  <piefel@informatik.hu-berlin.de>
+
+	* patchlvl.h, useocc.k, util.k: Kimwitu++ initial version,
+	copy of Kimwitu 4.4
+
+	* patchlvl.h, useocc.k, util.k: New file.
+
+	* gutil.k, kimwl.l, kimwy.y, main.k, parse.k, pat.k:
+	Kimwitu++ initial version,
+	copy of Kimwitu 4.4
+
+	* gutil.k, kimwl.l, kimwy.y, main.k, parse.k, pat.k: New file.
+
+	* bisonsim.msg, bisonsim.rec, errmsg.pl: *** empty log message ***
+
+	* README, TODO, abs.k, defocc.k, errmsg.h, error.k, extocc.k, gen.k:
+	Kimwitu++ initial version,
+	copy of Kimwitu 4.4
+
+	* README, TODO, abs.k, bisonsim.msg, bisonsim.rec, defocc.k, errmsg.h, errmsg.pl, error.k, extocc.k, gen.k:
+	New file.
+
+	* CHANGES, LICENSE, Makefile: Kimwitu++ initial version,
+	copy of Kimwitu 4.4
+
+	* .cvsignore, CHANGES, LICENSE, Makefile: New file.
+
+	* .cvsignore:
+	Work around gcc incorrectly instantiating relops::operator>
+

@@ -1,0 +1,29 @@
+ =--------------
+ =
+ =  Installation instructions for the Term Processor Kimwitu++
+ =
+ =--------------
+
+
+Usually, all you have to do is just a plain
+
+    ./configure
+    make
+
+This will leave an executable kc++ in the top directory of the distribution.
+Since this is really all you need, there is no 'make install' and such. Just
+copy the file to a convenient location.
+
+If you don't want to run configure, edit the Makefile.in by hand; right now
+it's only used for the version number.
+
+There is also documentation in two places. In the directory 'man' you'll find
+a man page with an ultra-short description of how to invoke kc++, the Kimwitu++
+'compiler.' More documentation is in the doc directory, in LaTeX format. Do
+
+    cd doc
+    make
+
+to obtain a printable version (this is not yet 'implemented').
+
+More info in the README file.

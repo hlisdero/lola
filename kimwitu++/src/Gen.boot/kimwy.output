@@ -1,0 +1,6903 @@
+Terminals which are not used
+
+   T_PERCENTRVIEWVAR
+
+
+Grammar
+
+    0 $accept: specification $end
+
+    1 dollarvar: T_DOLLARVAR
+
+    2 id: T_ID
+
+    3 integer: T_INT
+
+    4 @1: /* empty */
+
+    5 specification: @1 declarations
+
+    6 declarations: /* empty */
+    7             | declarations declaration
+
+    8 declaration: phylumdeclaration
+    9            | rwdeclaration
+   10            | ac_function_definition
+   11            | includedeclaration
+   12            | unparsedeclaration
+   13            | uviewdeclaration
+   14            | rviewdeclaration
+   15            | storageclassdeclaration
+   16            | languagedeclaration
+   17            | baseclassdeclaration
+
+   18 baseclassdeclaration: T_BASECLASS id ':' baseclass_list ';'
+
+   19 baseclass_list: id
+   20               | baseclass_list ',' id
+
+   21 @2: /* empty */
+
+   22 phylumdeclaration: id storageoption ':' @2 productionblock Ccode_option ';'
+
+   23 storageoption: /* empty */
+   24              | '{' id '}'
+   25              | '{' '!' id '}'
+   26              | '{' error
+   27              | '{' '!' error
+
+   28 productionblock: /* empty */
+   29                | T_LIST id
+   30                | alternatives
+
+   31 alternatives: alternative
+   32             | alternatives '|' alternative
+   33             | error
+   34             | alternatives '|' error
+   35             | alternatives error alternative
+
+   36 @3: /* empty */
+
+   37 @4: /* empty */
+
+   38 alternative: id '(' @3 arguments @4 ')'
+   39            | id '(' error
+
+   40 arguments: /* empty */
+   41          | arguments id
+   42          | arguments T_ID ':' id
+
+   43 Ccode_option: /* empty */
+   44             | '{' attributes_option init_option '}'
+   45             | '{' error
+
+   46 attributes_option: /* empty */
+   47                  | attributes_option attribute
+
+   48 attribute: id id attribute_init_option ';'
+
+   49 attribute_init_option: /* empty */
+
+   50 @5: /* empty */
+
+   51 attribute_init_option: '=' @5 Cexpression
+
+   52 Cexpression: /* empty */
+   53            | Cexpression Cexpression_elem
+
+   54 Cexpression_elem: T_CEXPRESSION
+   55                 | dollarvar
+   56                 | '\n'
+   57                 | '"' CexpressionDQ '"'
+   58                 | ''' CexpressionSQ '''
+   59                 | '(' Cexpression_inner ')'
+   60                 | '[' Cexpression_inner ']'
+   61                 | '"' error
+   62                 | ''' error
+   63                 | '(' error
+   64                 | '[' error
+
+   65 Cexpression_inner: /* empty */
+   66                  | Cexpression_inner Cexpression_elem_inner
+
+   67 Cexpression_elem_inner: Cexpression_elem
+   68                       | ','
+
+   69 quote_or_error: '"'
+   70               | error
+
+   71 CexpressionDQ: /* empty */
+   72              | CexpressionDQ CexpressionDQ_elem
+
+   73 CexpressionDQ_elem: T_CEXPRESSION
+   74                   | '\n'
+
+   75 CexpressionSQ: /* empty */
+   76              | CexpressionSQ CexpressionSQ_elem
+
+   77 CexpressionSQ_elem: T_CEXPRESSION
+   78                   | '\n'
+
+   79 idCexpressions: idCexpression
+   80               | idCexpressions ',' idCexpression
+
+   81 @6: /* empty */
+
+   82 @7: /* empty */
+
+   83 idCexpression: id @6 Cexpression @7
+
+   84 withCexpression: Cexpression
+
+   85 withCexpressions: withCexpression
+
+   86 @8: /* empty */
+
+   87 withCexpressions: withCexpressions ',' @8 withCexpression
+
+   88 @9: /* empty */
+
+   89 @10: /* empty */
+
+   90 MainCbody: '{' @9 MainCBodycontinuation @10 '}'
+
+   91 @11: /* empty */
+
+   92 @12: /* empty */
+
+   93 MainCbodyinC: '{' @11 MainCBodycontinuation @12 '}'
+
+   94 MainCBodycontinuation: Ctext
+   95                      | withcases
+   96                      | error
+
+   97 @13: /* empty */
+
+   98 @14: /* empty */
+
+   99 Cbody: '{' @13 Ctext @14 '}'
+
+  100 Ctext: /* empty */
+
+  101 @15: /* empty */
+
+  102 Ctext: Ctext @15 Ctext_elem
+
+  103 Ctext_elem: T_CLINE
+  104           | dollarvar
+  105           | '\n'
+  106           | T_CNEWLINES
+
+  107 @16: /* empty */
+
+  108 Ctext_elem: '"' @16 CexpressionDQ '"'
+
+  109 @17: /* empty */
+
+  110 Ctext_elem: ''' @17 CexpressionSQ '''
+  111           | Cbody
+
+  112 @18: /* empty */
+
+  113 Ctext_elem: T_FOREACH @18 foreach_continuation
+
+  114 @19: /* empty */
+
+  115 @20: /* empty */
+
+  116 @21: /* empty */
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 ')' '{' withcases '}'
+
+  118 @22: /* empty */
+
+  119 @23: /* empty */
+
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions ')' MainCbodyinC @23 foreach_end_continuation
+
+  121 foreach_end_continuation: /* empty */
+
+  122 @24: /* empty */
+
+  123 @25: /* empty */
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' patternchain @25 ')' MainCbodyinC
+
+  125 init_option: /* empty */
+  126            | Cbody
+
+  127 @26: /* empty */
+
+  128 includedeclaration: T_INCLUDESTART includefiles_option @26 T_ENDOFINCLUDESTART T_INCLUDEEND
+  129                   | T_INCLUDESTART error T_INCLUDEEND
+
+  130 includefiles_option: /* empty */
+  131                    | includefiles
+
+  132 includefiles: T_ID
+  133             | includefiles T_ID
+
+  134 @27: /* empty */
+
+  135 rwdeclaration: outmostpatterns T_ARROW @27 rwclauses semi_or_error
+
+  136 rwclauses: rwclause
+  137          | rwclauses rwclause
+
+  138 rwclause: '<' useviewnames ':' term '>'
+
+  139 semi_or_error: ';'
+  140              | error
+
+  141 patternchains: patternchain
+  142              | patternchains ',' patternchain
+
+  143 patternchain: patternchainitem_lineinfo
+  144             | patternchain '&' patternchainitem_lineinfo
+
+  145 @28: /* empty */
+
+  146 patternchainitem_lineinfo: @28 patternchainitem
+
+  147 patternchainitem: outmostpattern
+  148                 | '(' patternchains ')'
+  149                 | '$' id
+
+  150 outmostpatterns: outmostpattern
+  151                | outmostpatterns ',' outmostpattern
+  152                | error
+  153                | outmostpatterns error
+  154                | outmostpatterns ',' error
+  155                | outmostpatterns error outmostpattern
+
+  156 outmostpattern: id provideds
+  157               | id '(' patternsoption ')' provideds
+  158               | id '=' outmostpattern
+  159               | '*' provideds
+  160               | T_DEFAULT provideds
+
+  161 provideds: /* empty */
+
+  162 @29: /* empty */
+
+  163 @30: /* empty */
+
+  164 provideds: T_PROVIDED '(' @29 Cexpression @30 ')'
+
+  165 pattern: id
+  166        | id '(' patternsoption ')'
+  167        | '*'
+  168        | T_DEFAULT
+  169        | id '=' pattern
+
+  170 @31: /* empty */
+
+  171 pattern: '"' @31 CexpressionDQ '"'
+  172        | integer
+
+  173 patternsoption: /* empty */
+  174               | patterns
+
+  175 patterns: pattern
+  176         | patterns ',' pattern
+  177         | error
+  178         | patterns error
+  179         | patterns ',' error
+  180         | patterns error pattern
+
+  181 term: id
+  182     | id '(' termsoption ')'
+  183     | term T_ARROW id '(' termsoption ')'
+  184     | term '.' id '(' termsoption ')'
+  185     | term T_ARROW id
+  186     | term '.' id
+
+  187 @32: /* empty */
+
+  188 term: ''' @32 CexpressionSQ '''
+
+  189 @33: /* empty */
+
+  190 term: '"' @33 CexpressionDQ '"'
+  191     | integer
+
+  192 termsoption: /* empty */
+  193            | terms
+
+  194 terms: term
+  195      | terms ',' term
+  196      | error
+  197      | terms error
+  198      | terms ',' error
+  199      | terms error term
+
+  200 withcases: withcase
+  201          | withcases withcase
+
+  202 withcase: patternchains ':' Cbody
+
+  203 @34: /* empty */
+
+  204 unparsedeclaration: outmostpatterns T_ARROW @34 unparseclauses ';'
+  205                   | outmostpatterns T_ARROW error ';'
+
+  206 unparseclauses: unparseclause
+  207               | unparseclauses unparseclause
+
+  208 unparseclause: '[' useviewnames ':' unparseitems ']'
+  209              | '[' useviewnames ':' error
+  210              | '[' error ':' unparseitems ']'
+  211              | '[' error ':' error
+  212              | '[' error
+
+  213 useviewnames: /* empty */
+  214             | useviewnames id
+
+  215 unparseitems: /* empty */
+  216             | unparseitems unparseitem
+
+  217 @35: /* empty */
+
+  218 @36: /* empty */
+
+  219 unparseitem: languageoption '"' @35 CexpressionDQ quote_or_error @36 viewnameoption
+  220            | languageoption unpsubterm viewnameoption
+  221            | languageoption Cbody
+  222            | languageoption T_UNPBLOCKSTART unparseitems T_UNPBLOCKEND
+
+  223 @37: /* empty */
+
+  224 @38: /* empty */
+
+  225 unparseitem: T_PERCENTUVIEWVAR id id @37 Cexpression @38 ';'
+
+  226 unpsubterm: id
+  227           | dollarvar
+  228           | id unpattributes
+  229           | dollarvar unpattributes
+  230           | '(' id ')' id
+
+  231 unpattributes: unpattribute
+  232              | unpattributes unpattribute
+
+  233 unpattribute: T_ARROW id
+  234             | T_ARROW error
+
+  235 viewnameoption: /* empty */
+  236               | ':' id
+  237               | ':' error
+
+  238 uviewdeclaration: T_PERCENTUVIEW defuviewnames ';'
+  239                 | T_PERCENTUVIEW error ';'
+
+  240 defuviewnames: id
+  241              | '(' id ')'
+  242              | defuviewnames id
+  243              | defuviewnames '(' id ')'
+  244              | defuviewnames ',' id
+  245              | defuviewnames ',' '(' id ')'
+  246              | defuviewnames error
+  247              | defuviewnames ',' error
+
+  248 rviewdeclaration: T_PERCENTRVIEW defrviewnames ';'
+  249                 | T_PERCENTRVIEW error ';'
+
+  250 defrviewnames: id
+  251              | '(' id ')'
+  252              | defrviewnames id
+  253              | defrviewnames '(' id ')'
+  254              | defrviewnames ',' id
+  255              | defrviewnames ',' '(' id ')'
+  256              | defrviewnames error
+  257              | defrviewnames ',' error
+
+  258 storageclassdeclaration: T_PERCENTSTORAGECLASS defstorageclasses ';'
+  259                        | T_PERCENTSTORAGECLASS error ';'
+
+  260 defstorageclasses: id
+  261                  | defstorageclasses id
+  262                  | defstorageclasses ',' id
+  263                  | defstorageclasses error
+  264                  | defstorageclasses ',' error
+
+  265 ac_function_definition: ac_declaration_specifiers ac_fn_declarator ac_compound_statement
+  266                       | id T_COLONCOLON T_OPERATOR id '(' ')' ac_opt_const ac_compound_statement
+  267                       | T_CONSTRUCTOR id '(' ac_parameter_type_list ')' ac_opt_base_init_list ac_compound_statement
+  268                       | T_DESTRUCTOR opt_virtual id '(' ')' ac_compound_statement
+  269                       | T_MEMBER ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';'
+  270                       | T_ATTR ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';'
+
+  271 ac_opt_base_init_list: /* empty */
+  272                      | ':' ac_base_init_list
+
+  273 ac_base_init_list: ac_base_init
+  274                  | ac_base_init_list ',' ac_base_init
+
+  275 ac_base_init: id '(' ac_constant_expression_init_list ')'
+
+  276 ac_default_arg_init: /* empty */
+  277                    | '=' ac_constant_expression
+
+  278 ac_opt_member_init: /* empty */
+  279                   | '=' ac_constant_expression
+  280                   | '(' ac_constant_expression ')'
+
+  281 ac_declaration_specifiers: ac_type_specifier
+  282                          | ac_storage_class_specifier ac_type_specifier
+  283                          | ac_type_qualifier ac_type_specifier
+  284                          | ac_storage_class_specifier ac_type_qualifier ac_type_specifier
+
+  285 ac_member_declaration_specifiers: ac_type_specifier
+  286                                 | ac_member_storage_class_specifier ac_type_specifier
+  287                                 | ac_type_qualifier ac_type_specifier
+  288                                 | ac_member_storage_class_specifier ac_type_qualifier ac_type_specifier
+
+  289 ac_storage_class_specifier: T_AUTO
+  290                           | T_REGISTER
+  291                           | T_STATIC
+  292                           | T_EXTERN
+  293                           | T_TYPEDEF
+  294                           | T_VIRTUAL
+
+  295 ac_member_storage_class_specifier: T_STATIC
+
+  296 opt_virtual: /* empty */
+  297            | T_VIRTUAL
+
+  298 ac_type_specifier: id
+
+  299 ac_type_qualifier: T_CONST
+  300                  | T_VOLATILE
+  301                  | T_UNSIGNED
+
+  302 ac_fn_declarator: ac_direct_fn_declarator
+  303                 | ac_pointer ac_direct_fn_declarator
+  304                 | '&' ac_direct_fn_declarator
+  305                 | ac_pointer '&' ac_direct_fn_declarator
+
+  306 ac_declarator: ac_direct_declarator
+  307              | ac_pointer ac_direct_declarator
+  308              | '&' ac_direct_declarator
+  309              | ac_pointer '&' ac_direct_declarator
+
+  310 ac_member_declarator: ac_direct_member_declarator
+  311                     | ac_pointer ac_direct_member_declarator
+  312                     | '&' ac_direct_member_declarator
+  313                     | ac_pointer '&' ac_direct_member_declarator
+
+  314 ac_pointer_declarator: ac_pointer ac_direct_declarator
+  315                      | ac_pointer '&' ac_direct_declarator
+
+  316 ac_direct_declarator: ac_identifier
+  317                     | '(' ac_pointer_declarator ')'
+  318                     | ac_direct_declarator '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator '(' ac_parameter_type_list ')'
+
+  320 ac_direct_member_declarator: id T_COLONCOLON id ac_constant_expression_list
+
+  321 ac_constant_expression_list: /* empty */
+  322                            | ac_constant_expression_list '[' ac_constant_expression ']'
+
+  323 ac_constant_expression_init_list: ac_constant_expression
+  324                                 | ac_constant_expression_init_list ',' ac_constant_expression
+
+  325 ac_direct_fn_declarator: ac_qualifier '(' ac_parameter_type_list ')' ac_opt_const
+  326                        | ac_qualifier '(' error ')' ac_opt_const
+
+  327 ac_qualifier: ac_fn_declarator_id
+  328             | ac_qualifier T_COLONCOLON ac_fn_declarator_id
+
+  329 ac_fn_declarator_id: id
+  330                    | T_OPERATOR T_OPNAME
+
+  331 ac_opt_const: /* empty */
+  332             | T_CONST
+
+  333 ac_pointer: '*'
+  334           | '*' ac_type_qualifier_list
+  335           | '*' ac_pointer
+  336           | '*' ac_type_qualifier_list ac_pointer
+
+  337 ac_type_qualifier_list: ac_type_qualifier
+  338                       | ac_type_qualifier_list ac_type_qualifier
+
+  339 ac_parameter_type_list: /* empty */
+  340                       | T_DOTDOTDOT
+  341                       | ac_parameter_list
+  342                       | ac_parameter_list T_DOTDOTDOT
+  343                       | ac_parameter_list ',' T_DOTDOTDOT
+
+  344 ac_parameter_list: ac_parameter_declaration
+  345                  | ac_parameter_list ',' ac_parameter_declaration
+
+  346 ac_parameter_declaration: ac_declaration_specifiers ac_declarator ac_default_arg_init
+  347                         | ac_declaration_specifiers ac_abstract_declarator ac_default_arg_init
+
+  348 ac_abstract_declarator: ac_pointer
+  349                       | ac_direct_abstract_declarator
+  350                       | ac_pointer ac_direct_abstract_declarator
+
+  351 ac_direct_abstract_declarator: '(' ac_abstract_declarator ')'
+  352                              | ac_direct_abstract_declarator '[' ac_constant_expression_option ']'
+  353                              | '[' ac_constant_expression_option ']'
+  354                              | ac_direct_abstract_declarator '(' ac_parameter_type_list ')'
+  355                              | '(' ac_parameter_type_list ')'
+
+  356 ac_constant_expression_option: ac_constant_expression
+
+  357 @39: /* empty */
+
+  358 ac_constant_expression: @39 Cexpression
+
+  359 ac_identifier: id
+  360              | '$' id
+
+  361 ac_compound_statement: MainCbody
+
+  362 @40: /* empty */
+
+  363 ac_compound_statement: error ';' @40 ac_compound_statement
+
+  364 languageoption: '<' languageoptions '>' ':'
+  365               | /* empty */
+
+  366 languageoptions: id
+  367                | languageoptions ',' id
+  368                | error
+  369                | languageoptions error
+  370                | languageoptions ',' error
+  371                | languageoptions error id
+
+  372 languagedeclaration: T_PERCENTLANGUAGE deflanguagenames ';'
+  373                    | T_PERCENTLANGUAGE error ';'
+
+  374 deflanguagenames: id
+  375                 | deflanguagenames id
+  376                 | deflanguagenames ',' id
+  377                 | deflanguagenames error
+  378                 | deflanguagenames ',' error
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'\n' (10) 56 74 78 105
+'!' (33) 25 27
+'"' (34) 57 61 69 108 171 190 219
+'$' (36) 149 360
+'&' (38) 144 304 305 308 309 312 313 315
+''' (39) 58 62 110 188
+'(' (40) 38 39 59 63 117 120 124 148 157 164 166 182 183 184 230 241
+    243 245 251 253 255 266 267 268 275 280 317 319 325 326 351 354
+    355
+')' (41) 38 59 117 120 124 148 157 164 166 182 183 184 230 241 243
+    245 251 253 255 266 267 268 275 280 317 319 325 326 351 354 355
+'*' (42) 159 167 333 334 335 336
+',' (44) 20 68 80 87 142 151 154 176 179 195 198 244 245 247 254 255
+    257 262 264 274 324 343 345 367 370 376 378
+'.' (46) 184 186
+':' (58) 18 22 42 138 202 208 209 210 211 236 237 272 364
+';' (59) 18 22 48 120 139 204 205 225 238 239 248 249 258 259 269 270
+    363 372 373
+'<' (60) 138 364
+'=' (61) 51 158 169 277 279
+'>' (62) 138 364
+'[' (91) 60 64 208 209 210 211 212 318 322 352 353
+']' (93) 60 208 210 318 322 352 353
+'{' (123) 24 25 26 27 44 45 90 93 99 117
+'|' (124) 32 34
+'}' (125) 24 25 44 90 93 99 117
+error (256) 26 27 33 34 35 39 45 61 62 63 64 70 96 129 140 152 153
+    154 155 177 178 179 180 196 197 198 199 205 209 210 211 212 234
+    237 239 246 247 249 256 257 259 263 264 326 363 368 369 370 371
+    373 377 378
+T_ID (258) 2 42 132 133
+T_OPNAME (259) 330
+T_INT (260) 3
+T_CNEWLINES (261) 106
+T_CLINE (262) 103
+T_CEXPRESSION (263) 54 73 77
+T_DOLLARVAR (264) 1
+T_INCLUDEEND (265) 128 129
+T_INCLUDESTART (266) 128 129
+T_ENDOFINCLUDESTART (267) 128
+T_LIST (268) 29
+T_ARROW (269) 135 183 185 204 205 233 234
+T_PROVIDED (270) 164
+T_STATIC (271) 291 295
+T_WITH (272) 117
+T_FOREACH (273) 113
+T_FOREACH_AFTER (274) 124
+T_DEFAULT (275) 160 168
+T_UNPBLOCKSTART (276) 222
+T_UNPBLOCKEND (277) 222
+T_PERCENTRVIEW (278) 248 249
+T_PERCENTRVIEWVAR (279)
+T_PERCENTUVIEW (280) 238 239
+T_PERCENTUVIEWVAR (281) 225
+T_PERCENTSTORAGECLASS (282) 258 259
+T_PERCENTLANGUAGE (283) 372 373
+T_AUTO (284) 289
+T_REGISTER (285) 290
+T_EXTERN (286) 292
+T_TYPEDEF (287) 293
+T_CONST (288) 299 332
+T_VOLATILE (289) 300
+T_UNSIGNED (290) 301
+T_VIRTUAL (291) 294 297
+T_DOTDOTDOT (292) 340 342 343
+T_COLONCOLON (293) 266 320 328
+T_OPERATOR (294) 266 330
+T_CONSTRUCTOR (295) 267
+T_DESTRUCTOR (296) 268
+T_MEMBER (297) 269
+T_ATTR (298) 270
+T_BASECLASS (299) 18
+
+
+Nonterminals, with rules where they appear
+
+$accept (66)
+    on left: 0
+dollarvar (67)
+    on left: 1, on right: 55 104 227 229
+id (68)
+    on left: 2, on right: 18 19 20 22 24 25 29 38 39 41 42 48 83 149
+    156 157 158 165 166 169 181 182 183 184 185 186 214 225 226 228
+    230 233 236 240 241 242 243 244 245 250 251 252 253 254 255 260
+    261 262 266 267 268 275 298 320 329 359 360 366 367 371 374 375
+    376
+integer (69)
+    on left: 3, on right: 172 191
+specification (70)
+    on left: 5, on right: 0
+@1 (71)
+    on left: 4, on right: 5
+declarations (72)
+    on left: 6 7, on right: 5 7
+declaration (73)
+    on left: 8 9 10 11 12 13 14 15 16 17, on right: 7
+baseclassdeclaration (74)
+    on left: 18, on right: 17
+baseclass_list (75)
+    on left: 19 20, on right: 18 20
+phylumdeclaration (76)
+    on left: 22, on right: 8
+@2 (77)
+    on left: 21, on right: 22
+storageoption (78)
+    on left: 23 24 25 26 27, on right: 22
+productionblock (79)
+    on left: 28 29 30, on right: 22
+alternatives (80)
+    on left: 31 32 33 34 35, on right: 30 32 34 35
+alternative (81)
+    on left: 38 39, on right: 31 32 35
+@3 (82)
+    on left: 36, on right: 38
+@4 (83)
+    on left: 37, on right: 38
+arguments (84)
+    on left: 40 41 42, on right: 38 41 42
+Ccode_option (85)
+    on left: 43 44 45, on right: 22
+attributes_option (86)
+    on left: 46 47, on right: 44 47
+attribute (87)
+    on left: 48, on right: 47
+attribute_init_option (88)
+    on left: 49 51, on right: 48
+@5 (89)
+    on left: 50, on right: 51
+Cexpression (90)
+    on left: 52 53, on right: 51 53 83 84 164 225 358
+Cexpression_elem (91)
+    on left: 54 55 56 57 58 59 60 61 62 63 64, on right: 53 67
+Cexpression_inner (92)
+    on left: 65 66, on right: 59 60 66
+Cexpression_elem_inner (93)
+    on left: 67 68, on right: 66
+quote_or_error (94)
+    on left: 69 70, on right: 219
+CexpressionDQ (95)
+    on left: 71 72, on right: 57 72 108 171 190 219
+CexpressionDQ_elem (96)
+    on left: 73 74, on right: 72
+CexpressionSQ (97)
+    on left: 75 76, on right: 58 76 110 188
+CexpressionSQ_elem (98)
+    on left: 77 78, on right: 76
+idCexpressions (99)
+    on left: 79 80, on right: 80 120
+idCexpression (100)
+    on left: 83, on right: 79 80
+@6 (101)
+    on left: 81, on right: 83
+@7 (102)
+    on left: 82, on right: 83
+withCexpression (103)
+    on left: 84, on right: 85 87
+withCexpressions (104)
+    on left: 85 87, on right: 87 117
+@8 (105)
+    on left: 86, on right: 87
+MainCbody (106)
+    on left: 90, on right: 361
+@9 (107)
+    on left: 88, on right: 90
+@10 (108)
+    on left: 89, on right: 90
+MainCbodyinC (109)
+    on left: 93, on right: 120 124
+@11 (110)
+    on left: 91, on right: 93
+@12 (111)
+    on left: 92, on right: 93
+MainCBodycontinuation (112)
+    on left: 94 95 96, on right: 90 93
+Cbody (113)
+    on left: 99, on right: 111 126 202 221
+@13 (114)
+    on left: 97, on right: 99
+@14 (115)
+    on left: 98, on right: 99
+Ctext (116)
+    on left: 100 102, on right: 94 99 102
+@15 (117)
+    on left: 101, on right: 102
+Ctext_elem (118)
+    on left: 103 104 105 106 108 110 111 113 117, on right: 102
+@16 (119)
+    on left: 107, on right: 108
+@17 (120)
+    on left: 109, on right: 110
+@18 (121)
+    on left: 112, on right: 113
+@19 (122)
+    on left: 114, on right: 117
+@20 (123)
+    on left: 115, on right: 117
+@21 (124)
+    on left: 116, on right: 117
+foreach_continuation (125)
+    on left: 120, on right: 113
+@22 (126)
+    on left: 118, on right: 120
+@23 (127)
+    on left: 119, on right: 120
+foreach_end_continuation (128)
+    on left: 121 124, on right: 120
+@24 (129)
+    on left: 122, on right: 124
+@25 (130)
+    on left: 123, on right: 124
+init_option (131)
+    on left: 125 126, on right: 44
+includedeclaration (132)
+    on left: 128 129, on right: 11
+@26 (133)
+    on left: 127, on right: 128
+includefiles_option (134)
+    on left: 130 131, on right: 128
+includefiles (135)
+    on left: 132 133, on right: 131 133
+rwdeclaration (136)
+    on left: 135, on right: 9
+@27 (137)
+    on left: 134, on right: 135
+rwclauses (138)
+    on left: 136 137, on right: 135 137
+rwclause (139)
+    on left: 138, on right: 136 137
+semi_or_error (140)
+    on left: 139 140, on right: 135
+patternchains (141)
+    on left: 141 142, on right: 142 148 202
+patternchain (142)
+    on left: 143 144, on right: 120 124 141 142 144
+patternchainitem_lineinfo (143)
+    on left: 146, on right: 143 144
+@28 (144)
+    on left: 145, on right: 146
+patternchainitem (145)
+    on left: 147 148 149, on right: 146
+outmostpatterns (146)
+    on left: 150 151 152 153 154 155, on right: 135 151 153 154 155
+    204 205
+outmostpattern (147)
+    on left: 156 157 158 159 160, on right: 147 150 151 155 158
+provideds (148)
+    on left: 161 164, on right: 156 157 159 160
+@29 (149)
+    on left: 162, on right: 164
+@30 (150)
+    on left: 163, on right: 164
+pattern (151)
+    on left: 165 166 167 168 169 171 172, on right: 169 175 176 180
+@31 (152)
+    on left: 170, on right: 171
+patternsoption (153)
+    on left: 173 174, on right: 157 166
+patterns (154)
+    on left: 175 176 177 178 179 180, on right: 174 176 178 179 180
+term (155)
+    on left: 181 182 183 184 185 186 188 190 191, on right: 138 183
+    184 185 186 194 195 199
+@32 (156)
+    on left: 187, on right: 188
+@33 (157)
+    on left: 189, on right: 190
+termsoption (158)
+    on left: 192 193, on right: 182 183 184
+terms (159)
+    on left: 194 195 196 197 198 199, on right: 193 195 197 198 199
+withcases (160)
+    on left: 200 201, on right: 95 117 201
+withcase (161)
+    on left: 202, on right: 200 201
+unparsedeclaration (162)
+    on left: 204 205, on right: 12
+@34 (163)
+    on left: 203, on right: 204
+unparseclauses (164)
+    on left: 206 207, on right: 204 207
+unparseclause (165)
+    on left: 208 209 210 211 212, on right: 206 207
+useviewnames (166)
+    on left: 213 214, on right: 138 208 209 214
+unparseitems (167)
+    on left: 215 216, on right: 208 210 216 222
+unparseitem (168)
+    on left: 219 220 221 222 225, on right: 216
+@35 (169)
+    on left: 217, on right: 219
+@36 (170)
+    on left: 218, on right: 219
+@37 (171)
+    on left: 223, on right: 225
+@38 (172)
+    on left: 224, on right: 225
+unpsubterm (173)
+    on left: 226 227 228 229 230, on right: 220
+unpattributes (174)
+    on left: 231 232, on right: 228 229 232
+unpattribute (175)
+    on left: 233 234, on right: 231 232
+viewnameoption (176)
+    on left: 235 236 237, on right: 219 220
+uviewdeclaration (177)
+    on left: 238 239, on right: 13
+defuviewnames (178)
+    on left: 240 241 242 243 244 245 246 247, on right: 238 242 243
+    244 245 246 247
+rviewdeclaration (179)
+    on left: 248 249, on right: 14
+defrviewnames (180)
+    on left: 250 251 252 253 254 255 256 257, on right: 248 252 253
+    254 255 256 257
+storageclassdeclaration (181)
+    on left: 258 259, on right: 15
+defstorageclasses (182)
+    on left: 260 261 262 263 264, on right: 258 261 262 263 264
+ac_function_definition (183)
+    on left: 265 266 267 268 269 270, on right: 10
+ac_opt_base_init_list (184)
+    on left: 271 272, on right: 267
+ac_base_init_list (185)
+    on left: 273 274, on right: 272 274
+ac_base_init (186)
+    on left: 275, on right: 273 274
+ac_default_arg_init (187)
+    on left: 276 277, on right: 346 347
+ac_opt_member_init (188)
+    on left: 278 279 280, on right: 269 270
+ac_declaration_specifiers (189)
+    on left: 281 282 283 284, on right: 265 346 347
+ac_member_declaration_specifiers (190)
+    on left: 285 286 287 288, on right: 269 270
+ac_storage_class_specifier (191)
+    on left: 289 290 291 292 293 294, on right: 282 284
+ac_member_storage_class_specifier (192)
+    on left: 295, on right: 286 288
+opt_virtual (193)
+    on left: 296 297, on right: 268
+ac_type_specifier (194)
+    on left: 298, on right: 281 282 283 284 285 286 287 288
+ac_type_qualifier (195)
+    on left: 299 300 301, on right: 283 284 287 288 337 338
+ac_fn_declarator (196)
+    on left: 302 303 304 305, on right: 265
+ac_declarator (197)
+    on left: 306 307 308 309, on right: 346
+ac_member_declarator (198)
+    on left: 310 311 312 313, on right: 269 270
+ac_pointer_declarator (199)
+    on left: 314 315, on right: 317
+ac_direct_declarator (200)
+    on left: 316 317 318 319, on right: 306 307 308 309 314 315 318
+    319
+ac_direct_member_declarator (201)
+    on left: 320, on right: 310 311 312 313
+ac_constant_expression_list (202)
+    on left: 321 322, on right: 320 322
+ac_constant_expression_init_list (203)
+    on left: 323 324, on right: 275 324
+ac_direct_fn_declarator (204)
+    on left: 325 326, on right: 302 303 304 305
+ac_qualifier (205)
+    on left: 327 328, on right: 325 326 328
+ac_fn_declarator_id (206)
+    on left: 329 330, on right: 327 328
+ac_opt_const (207)
+    on left: 331 332, on right: 266 325 326
+ac_pointer (208)
+    on left: 333 334 335 336, on right: 303 305 307 309 311 313 314
+    315 335 336 348 350
+ac_type_qualifier_list (209)
+    on left: 337 338, on right: 334 336 338
+ac_parameter_type_list (210)
+    on left: 339 340 341 342 343, on right: 267 319 325 354 355
+ac_parameter_list (211)
+    on left: 344 345, on right: 341 342 343 345
+ac_parameter_declaration (212)
+    on left: 346 347, on right: 344 345
+ac_abstract_declarator (213)
+    on left: 348 349 350, on right: 347 351
+ac_direct_abstract_declarator (214)
+    on left: 351 352 353 354 355, on right: 349 350 352 354
+ac_constant_expression_option (215)
+    on left: 356, on right: 318 352 353
+ac_constant_expression (216)
+    on left: 358, on right: 277 279 280 322 323 324 356
+@39 (217)
+    on left: 357, on right: 358
+ac_identifier (218)
+    on left: 359 360, on right: 316
+ac_compound_statement (219)
+    on left: 361 363, on right: 265 266 267 268 363
+@40 (220)
+    on left: 362, on right: 363
+languageoption (221)
+    on left: 364 365, on right: 219 220 221 222
+languageoptions (222)
+    on left: 366 367 368 369 370 371, on right: 364 367 369 370 371
+languagedeclaration (223)
+    on left: 372 373, on right: 16
+deflanguagenames (224)
+    on left: 374 375 376 377 378, on right: 372 375 376 377 378
+
+
+state 0
+
+    0 $accept: . specification $end
+
+    $default  reduce using rule 4 (@1)
+
+    specification  go to state 1
+    @1             go to state 2
+
+
+state 1
+
+    0 $accept: specification . $end
+
+    $end  shift, and go to state 3
+
+
+state 2
+
+    5 specification: @1 . declarations
+
+    $default  reduce using rule 6 (declarations)
+
+    declarations  go to state 4
+
+
+state 3
+
+    0 $accept: specification $end .
+
+    $default  accept
+
+
+state 4
+
+    5 specification: @1 declarations .
+    7 declarations: declarations . declaration
+
+    error                  shift, and go to state 5
+    T_ID                   shift, and go to state 6
+    T_INCLUDESTART         shift, and go to state 7
+    T_STATIC               shift, and go to state 8
+    T_DEFAULT              shift, and go to state 9
+    T_PERCENTRVIEW         shift, and go to state 10
+    T_PERCENTUVIEW         shift, and go to state 11
+    T_PERCENTSTORAGECLASS  shift, and go to state 12
+    T_PERCENTLANGUAGE      shift, and go to state 13
+    T_AUTO                 shift, and go to state 14
+    T_REGISTER             shift, and go to state 15
+    T_EXTERN               shift, and go to state 16
+    T_TYPEDEF              shift, and go to state 17
+    T_CONST                shift, and go to state 18
+    T_VOLATILE             shift, and go to state 19
+    T_UNSIGNED             shift, and go to state 20
+    T_VIRTUAL              shift, and go to state 21
+    T_CONSTRUCTOR          shift, and go to state 22
+    T_DESTRUCTOR           shift, and go to state 23
+    T_MEMBER               shift, and go to state 24
+    T_ATTR                 shift, and go to state 25
+    T_BASECLASS            shift, and go to state 26
+    '*'                    shift, and go to state 27
+
+    $end  reduce using rule 5 (specification)
+
+    id                          go to state 28
+    declaration                 go to state 29
+    baseclassdeclaration        go to state 30
+    phylumdeclaration           go to state 31
+    includedeclaration          go to state 32
+    rwdeclaration               go to state 33
+    outmostpatterns             go to state 34
+    outmostpattern              go to state 35
+    unparsedeclaration          go to state 36
+    uviewdeclaration            go to state 37
+    rviewdeclaration            go to state 38
+    storageclassdeclaration     go to state 39
+    ac_function_definition      go to state 40
+    ac_declaration_specifiers   go to state 41
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    languagedeclaration         go to state 45
+
+
+state 5
+
+  152 outmostpatterns: error .
+
+    $default  reduce using rule 152 (outmostpatterns)
+
+
+state 6
+
+    2 id: T_ID .
+
+    $default  reduce using rule 2 (id)
+
+
+state 7
+
+  128 includedeclaration: T_INCLUDESTART . includefiles_option @26 T_ENDOFINCLUDESTART T_INCLUDEEND
+  129                   | T_INCLUDESTART . error T_INCLUDEEND
+
+    error  shift, and go to state 46
+    T_ID   shift, and go to state 47
+
+    T_ENDOFINCLUDESTART  reduce using rule 130 (includefiles_option)
+
+    includefiles_option  go to state 48
+    includefiles         go to state 49
+
+
+state 8
+
+  291 ac_storage_class_specifier: T_STATIC .
+
+    $default  reduce using rule 291 (ac_storage_class_specifier)
+
+
+state 9
+
+  160 outmostpattern: T_DEFAULT . provideds
+
+    T_PROVIDED  shift, and go to state 50
+
+    $default  reduce using rule 161 (provideds)
+
+    provideds  go to state 51
+
+
+state 10
+
+  248 rviewdeclaration: T_PERCENTRVIEW . defrviewnames ';'
+  249                 | T_PERCENTRVIEW . error ';'
+
+    error  shift, and go to state 52
+    T_ID   shift, and go to state 6
+    '('    shift, and go to state 53
+
+    id             go to state 54
+    defrviewnames  go to state 55
+
+
+state 11
+
+  238 uviewdeclaration: T_PERCENTUVIEW . defuviewnames ';'
+  239                 | T_PERCENTUVIEW . error ';'
+
+    error  shift, and go to state 56
+    T_ID   shift, and go to state 6
+    '('    shift, and go to state 57
+
+    id             go to state 58
+    defuviewnames  go to state 59
+
+
+state 12
+
+  258 storageclassdeclaration: T_PERCENTSTORAGECLASS . defstorageclasses ';'
+  259                        | T_PERCENTSTORAGECLASS . error ';'
+
+    error  shift, and go to state 60
+    T_ID   shift, and go to state 6
+
+    id                 go to state 61
+    defstorageclasses  go to state 62
+
+
+state 13
+
+  372 languagedeclaration: T_PERCENTLANGUAGE . deflanguagenames ';'
+  373                    | T_PERCENTLANGUAGE . error ';'
+
+    error  shift, and go to state 63
+    T_ID   shift, and go to state 6
+
+    id                go to state 64
+    deflanguagenames  go to state 65
+
+
+state 14
+
+  289 ac_storage_class_specifier: T_AUTO .
+
+    $default  reduce using rule 289 (ac_storage_class_specifier)
+
+
+state 15
+
+  290 ac_storage_class_specifier: T_REGISTER .
+
+    $default  reduce using rule 290 (ac_storage_class_specifier)
+
+
+state 16
+
+  292 ac_storage_class_specifier: T_EXTERN .
+
+    $default  reduce using rule 292 (ac_storage_class_specifier)
+
+
+state 17
+
+  293 ac_storage_class_specifier: T_TYPEDEF .
+
+    $default  reduce using rule 293 (ac_storage_class_specifier)
+
+
+state 18
+
+  299 ac_type_qualifier: T_CONST .
+
+    $default  reduce using rule 299 (ac_type_qualifier)
+
+
+state 19
+
+  300 ac_type_qualifier: T_VOLATILE .
+
+    $default  reduce using rule 300 (ac_type_qualifier)
+
+
+state 20
+
+  301 ac_type_qualifier: T_UNSIGNED .
+
+    $default  reduce using rule 301 (ac_type_qualifier)
+
+
+state 21
+
+  294 ac_storage_class_specifier: T_VIRTUAL .
+
+    $default  reduce using rule 294 (ac_storage_class_specifier)
+
+
+state 22
+
+  267 ac_function_definition: T_CONSTRUCTOR . id '(' ac_parameter_type_list ')' ac_opt_base_init_list ac_compound_statement
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 66
+
+
+state 23
+
+  268 ac_function_definition: T_DESTRUCTOR . opt_virtual id '(' ')' ac_compound_statement
+
+    T_VIRTUAL  shift, and go to state 67
+
+    $default  reduce using rule 296 (opt_virtual)
+
+    opt_virtual  go to state 68
+
+
+state 24
+
+  269 ac_function_definition: T_MEMBER . ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';'
+
+    T_ID        shift, and go to state 6
+    T_STATIC    shift, and go to state 69
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+
+    id                                 go to state 70
+    ac_member_declaration_specifiers   go to state 71
+    ac_member_storage_class_specifier  go to state 72
+    ac_type_specifier                  go to state 73
+    ac_type_qualifier                  go to state 74
+
+
+state 25
+
+  270 ac_function_definition: T_ATTR . ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';'
+
+    T_ID        shift, and go to state 6
+    T_STATIC    shift, and go to state 69
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+
+    id                                 go to state 70
+    ac_member_declaration_specifiers   go to state 75
+    ac_member_storage_class_specifier  go to state 72
+    ac_type_specifier                  go to state 73
+    ac_type_qualifier                  go to state 74
+
+
+state 26
+
+   18 baseclassdeclaration: T_BASECLASS . id ':' baseclass_list ';'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 76
+
+
+state 27
+
+  159 outmostpattern: '*' . provideds
+
+    T_PROVIDED  shift, and go to state 50
+
+    $default  reduce using rule 161 (provideds)
+
+    provideds  go to state 77
+
+
+state 28
+
+   22 phylumdeclaration: id . storageoption ':' @2 productionblock Ccode_option ';'
+  156 outmostpattern: id . provideds
+  157               | id . '(' patternsoption ')' provideds
+  158               | id . '=' outmostpattern
+  266 ac_function_definition: id . T_COLONCOLON T_OPERATOR id '(' ')' ac_opt_const ac_compound_statement
+  298 ac_type_specifier: id .
+
+    T_PROVIDED    shift, and go to state 50
+    T_COLONCOLON  shift, and go to state 78
+    '{'           shift, and go to state 79
+    '('           shift, and go to state 80
+    '='           shift, and go to state 81
+
+    error     reduce using rule 161 (provideds)
+    T_ARROW   reduce using rule 161 (provideds)
+    ':'       reduce using rule 23 (storageoption)
+    ','       reduce using rule 161 (provideds)
+    $default  reduce using rule 298 (ac_type_specifier)
+
+    storageoption  go to state 82
+    provideds      go to state 83
+
+
+state 29
+
+    7 declarations: declarations declaration .
+
+    $default  reduce using rule 7 (declarations)
+
+
+state 30
+
+   17 declaration: baseclassdeclaration .
+
+    $default  reduce using rule 17 (declaration)
+
+
+state 31
+
+    8 declaration: phylumdeclaration .
+
+    $default  reduce using rule 8 (declaration)
+
+
+state 32
+
+   11 declaration: includedeclaration .
+
+    $default  reduce using rule 11 (declaration)
+
+
+state 33
+
+    9 declaration: rwdeclaration .
+
+    $default  reduce using rule 9 (declaration)
+
+
+state 34
+
+  135 rwdeclaration: outmostpatterns . T_ARROW @27 rwclauses semi_or_error
+  151 outmostpatterns: outmostpatterns . ',' outmostpattern
+  153                | outmostpatterns . error
+  154                | outmostpatterns . ',' error
+  155                | outmostpatterns . error outmostpattern
+  204 unparsedeclaration: outmostpatterns . T_ARROW @34 unparseclauses ';'
+  205                   | outmostpatterns . T_ARROW error ';'
+
+    error    shift, and go to state 84
+    T_ARROW  shift, and go to state 85
+    ','      shift, and go to state 86
+
+
+state 35
+
+  150 outmostpatterns: outmostpattern .
+
+    $default  reduce using rule 150 (outmostpatterns)
+
+
+state 36
+
+   12 declaration: unparsedeclaration .
+
+    $default  reduce using rule 12 (declaration)
+
+
+state 37
+
+   13 declaration: uviewdeclaration .
+
+    $default  reduce using rule 13 (declaration)
+
+
+state 38
+
+   14 declaration: rviewdeclaration .
+
+    $default  reduce using rule 14 (declaration)
+
+
+state 39
+
+   15 declaration: storageclassdeclaration .
+
+    $default  reduce using rule 15 (declaration)
+
+
+state 40
+
+   10 declaration: ac_function_definition .
+
+    $default  reduce using rule 10 (declaration)
+
+
+state 41
+
+  265 ac_function_definition: ac_declaration_specifiers . ac_fn_declarator ac_compound_statement
+
+    T_ID        shift, and go to state 6
+    T_OPERATOR  shift, and go to state 87
+    '&'         shift, and go to state 88
+    '*'         shift, and go to state 89
+
+    id                       go to state 90
+    ac_fn_declarator         go to state 91
+    ac_direct_fn_declarator  go to state 92
+    ac_qualifier             go to state 93
+    ac_fn_declarator_id      go to state 94
+    ac_pointer               go to state 95
+
+
+state 42
+
+  282 ac_declaration_specifiers: ac_storage_class_specifier . ac_type_specifier
+  284                          | ac_storage_class_specifier . ac_type_qualifier ac_type_specifier
+
+    T_ID        shift, and go to state 6
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+
+    id                 go to state 70
+    ac_type_specifier  go to state 96
+    ac_type_qualifier  go to state 97
+
+
+state 43
+
+  281 ac_declaration_specifiers: ac_type_specifier .
+
+    $default  reduce using rule 281 (ac_declaration_specifiers)
+
+
+state 44
+
+  283 ac_declaration_specifiers: ac_type_qualifier . ac_type_specifier
+
+    T_ID  shift, and go to state 6
+
+    id                 go to state 70
+    ac_type_specifier  go to state 98
+
+
+state 45
+
+   16 declaration: languagedeclaration .
+
+    $default  reduce using rule 16 (declaration)
+
+
+state 46
+
+  129 includedeclaration: T_INCLUDESTART error . T_INCLUDEEND
+
+    T_INCLUDEEND  shift, and go to state 99
+
+
+state 47
+
+  132 includefiles: T_ID .
+
+    $default  reduce using rule 132 (includefiles)
+
+
+state 48
+
+  128 includedeclaration: T_INCLUDESTART includefiles_option . @26 T_ENDOFINCLUDESTART T_INCLUDEEND
+
+    $default  reduce using rule 127 (@26)
+
+    @26  go to state 100
+
+
+state 49
+
+  131 includefiles_option: includefiles .
+  133 includefiles: includefiles . T_ID
+
+    T_ID  shift, and go to state 101
+
+    $default  reduce using rule 131 (includefiles_option)
+
+
+state 50
+
+  164 provideds: T_PROVIDED . '(' @29 Cexpression @30 ')'
+
+    '('  shift, and go to state 102
+
+
+state 51
+
+  160 outmostpattern: T_DEFAULT provideds .
+
+    $default  reduce using rule 160 (outmostpattern)
+
+
+state 52
+
+  249 rviewdeclaration: T_PERCENTRVIEW error . ';'
+
+    ';'  shift, and go to state 103
+
+
+state 53
+
+  251 defrviewnames: '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 104
+
+
+state 54
+
+  250 defrviewnames: id .
+
+    $default  reduce using rule 250 (defrviewnames)
+
+
+state 55
+
+  248 rviewdeclaration: T_PERCENTRVIEW defrviewnames . ';'
+  252 defrviewnames: defrviewnames . id
+  253              | defrviewnames . '(' id ')'
+  254              | defrviewnames . ',' id
+  255              | defrviewnames . ',' '(' id ')'
+  256              | defrviewnames . error
+  257              | defrviewnames . ',' error
+
+    error  shift, and go to state 105
+    T_ID   shift, and go to state 6
+    ';'    shift, and go to state 106
+    ','    shift, and go to state 107
+    '('    shift, and go to state 108
+
+    id  go to state 109
+
+
+state 56
+
+  239 uviewdeclaration: T_PERCENTUVIEW error . ';'
+
+    ';'  shift, and go to state 110
+
+
+state 57
+
+  241 defuviewnames: '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 111
+
+
+state 58
+
+  240 defuviewnames: id .
+
+    $default  reduce using rule 240 (defuviewnames)
+
+
+state 59
+
+  238 uviewdeclaration: T_PERCENTUVIEW defuviewnames . ';'
+  242 defuviewnames: defuviewnames . id
+  243              | defuviewnames . '(' id ')'
+  244              | defuviewnames . ',' id
+  245              | defuviewnames . ',' '(' id ')'
+  246              | defuviewnames . error
+  247              | defuviewnames . ',' error
+
+    error  shift, and go to state 112
+    T_ID   shift, and go to state 6
+    ';'    shift, and go to state 113
+    ','    shift, and go to state 114
+    '('    shift, and go to state 115
+
+    id  go to state 116
+
+
+state 60
+
+  259 storageclassdeclaration: T_PERCENTSTORAGECLASS error . ';'
+
+    ';'  shift, and go to state 117
+
+
+state 61
+
+  260 defstorageclasses: id .
+
+    $default  reduce using rule 260 (defstorageclasses)
+
+
+state 62
+
+  258 storageclassdeclaration: T_PERCENTSTORAGECLASS defstorageclasses . ';'
+  261 defstorageclasses: defstorageclasses . id
+  262                  | defstorageclasses . ',' id
+  263                  | defstorageclasses . error
+  264                  | defstorageclasses . ',' error
+
+    error  shift, and go to state 118
+    T_ID   shift, and go to state 6
+    ';'    shift, and go to state 119
+    ','    shift, and go to state 120
+
+    id  go to state 121
+
+
+state 63
+
+  373 languagedeclaration: T_PERCENTLANGUAGE error . ';'
+
+    ';'  shift, and go to state 122
+
+
+state 64
+
+  374 deflanguagenames: id .
+
+    $default  reduce using rule 374 (deflanguagenames)
+
+
+state 65
+
+  372 languagedeclaration: T_PERCENTLANGUAGE deflanguagenames . ';'
+  375 deflanguagenames: deflanguagenames . id
+  376                 | deflanguagenames . ',' id
+  377                 | deflanguagenames . error
+  378                 | deflanguagenames . ',' error
+
+    error  shift, and go to state 123
+    T_ID   shift, and go to state 6
+    ';'    shift, and go to state 124
+    ','    shift, and go to state 125
+
+    id  go to state 126
+
+
+state 66
+
+  267 ac_function_definition: T_CONSTRUCTOR id . '(' ac_parameter_type_list ')' ac_opt_base_init_list ac_compound_statement
+
+    '('  shift, and go to state 127
+
+
+state 67
+
+  297 opt_virtual: T_VIRTUAL .
+
+    $default  reduce using rule 297 (opt_virtual)
+
+
+state 68
+
+  268 ac_function_definition: T_DESTRUCTOR opt_virtual . id '(' ')' ac_compound_statement
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 128
+
+
+state 69
+
+  295 ac_member_storage_class_specifier: T_STATIC .
+
+    $default  reduce using rule 295 (ac_member_storage_class_specifier)
+
+
+state 70
+
+  298 ac_type_specifier: id .
+
+    $default  reduce using rule 298 (ac_type_specifier)
+
+
+state 71
+
+  269 ac_function_definition: T_MEMBER ac_member_declaration_specifiers . ac_member_declarator ac_opt_member_init ';'
+
+    T_ID  shift, and go to state 6
+    '&'   shift, and go to state 129
+    '*'   shift, and go to state 89
+
+    id                           go to state 130
+    ac_member_declarator         go to state 131
+    ac_direct_member_declarator  go to state 132
+    ac_pointer                   go to state 133
+
+
+state 72
+
+  286 ac_member_declaration_specifiers: ac_member_storage_class_specifier . ac_type_specifier
+  288                                 | ac_member_storage_class_specifier . ac_type_qualifier ac_type_specifier
+
+    T_ID        shift, and go to state 6
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+
+    id                 go to state 70
+    ac_type_specifier  go to state 134
+    ac_type_qualifier  go to state 135
+
+
+state 73
+
+  285 ac_member_declaration_specifiers: ac_type_specifier .
+
+    $default  reduce using rule 285 (ac_member_declaration_specifiers)
+
+
+state 74
+
+  287 ac_member_declaration_specifiers: ac_type_qualifier . ac_type_specifier
+
+    T_ID  shift, and go to state 6
+
+    id                 go to state 70
+    ac_type_specifier  go to state 136
+
+
+state 75
+
+  270 ac_function_definition: T_ATTR ac_member_declaration_specifiers . ac_member_declarator ac_opt_member_init ';'
+
+    T_ID  shift, and go to state 6
+    '&'   shift, and go to state 129
+    '*'   shift, and go to state 89
+
+    id                           go to state 130
+    ac_member_declarator         go to state 137
+    ac_direct_member_declarator  go to state 132
+    ac_pointer                   go to state 133
+
+
+state 76
+
+   18 baseclassdeclaration: T_BASECLASS id . ':' baseclass_list ';'
+
+    ':'  shift, and go to state 138
+
+
+state 77
+
+  159 outmostpattern: '*' provideds .
+
+    $default  reduce using rule 159 (outmostpattern)
+
+
+state 78
+
+  266 ac_function_definition: id T_COLONCOLON . T_OPERATOR id '(' ')' ac_opt_const ac_compound_statement
+
+    T_OPERATOR  shift, and go to state 139
+
+
+state 79
+
+   24 storageoption: '{' . id '}'
+   25              | '{' . '!' id '}'
+   26              | '{' . error
+   27              | '{' . '!' error
+
+    error  shift, and go to state 140
+    T_ID   shift, and go to state 6
+    '!'    shift, and go to state 141
+
+    id  go to state 142
+
+
+state 80
+
+  157 outmostpattern: id '(' . patternsoption ')' provideds
+
+    error      shift, and go to state 143
+    T_ID       shift, and go to state 6
+    T_INT      shift, and go to state 144
+    T_DEFAULT  shift, and go to state 145
+    '"'        shift, and go to state 146
+    '*'        shift, and go to state 147
+
+    ')'  reduce using rule 173 (patternsoption)
+
+    id              go to state 148
+    integer         go to state 149
+    pattern         go to state 150
+    patternsoption  go to state 151
+    patterns        go to state 152
+
+
+state 81
+
+  158 outmostpattern: id '=' . outmostpattern
+
+    T_ID       shift, and go to state 6
+    T_DEFAULT  shift, and go to state 9
+    '*'        shift, and go to state 27
+
+    id              go to state 153
+    outmostpattern  go to state 154
+
+
+state 82
+
+   22 phylumdeclaration: id storageoption . ':' @2 productionblock Ccode_option ';'
+
+    ':'  shift, and go to state 155
+
+
+state 83
+
+  156 outmostpattern: id provideds .
+
+    $default  reduce using rule 156 (outmostpattern)
+
+
+state 84
+
+  153 outmostpatterns: outmostpatterns error .
+  155                | outmostpatterns error . outmostpattern
+
+    T_ID       shift, and go to state 6
+    T_DEFAULT  shift, and go to state 9
+    '*'        shift, and go to state 27
+
+    $default  reduce using rule 153 (outmostpatterns)
+
+    id              go to state 153
+    outmostpattern  go to state 156
+
+
+state 85
+
+  135 rwdeclaration: outmostpatterns T_ARROW . @27 rwclauses semi_or_error
+  204 unparsedeclaration: outmostpatterns T_ARROW . @34 unparseclauses ';'
+  205                   | outmostpatterns T_ARROW . error ';'
+
+    error  shift, and go to state 157
+
+    '['  reduce using rule 203 (@34)
+    '<'  reduce using rule 134 (@27)
+
+    @27  go to state 158
+    @34  go to state 159
+
+
+state 86
+
+  151 outmostpatterns: outmostpatterns ',' . outmostpattern
+  154                | outmostpatterns ',' . error
+
+    error      shift, and go to state 160
+    T_ID       shift, and go to state 6
+    T_DEFAULT  shift, and go to state 9
+    '*'        shift, and go to state 27
+
+    id              go to state 153
+    outmostpattern  go to state 161
+
+
+state 87
+
+  330 ac_fn_declarator_id: T_OPERATOR . T_OPNAME
+
+    T_OPNAME  shift, and go to state 162
+
+
+state 88
+
+  304 ac_fn_declarator: '&' . ac_direct_fn_declarator
+
+    T_ID        shift, and go to state 6
+    T_OPERATOR  shift, and go to state 87
+
+    id                       go to state 90
+    ac_direct_fn_declarator  go to state 163
+    ac_qualifier             go to state 93
+    ac_fn_declarator_id      go to state 94
+
+
+state 89
+
+  333 ac_pointer: '*' .
+  334           | '*' . ac_type_qualifier_list
+  335           | '*' . ac_pointer
+  336           | '*' . ac_type_qualifier_list ac_pointer
+
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+    '*'         shift, and go to state 89
+
+    $default  reduce using rule 333 (ac_pointer)
+
+    ac_type_qualifier       go to state 164
+    ac_pointer              go to state 165
+    ac_type_qualifier_list  go to state 166
+
+
+state 90
+
+  329 ac_fn_declarator_id: id .
+
+    $default  reduce using rule 329 (ac_fn_declarator_id)
+
+
+state 91
+
+  265 ac_function_definition: ac_declaration_specifiers ac_fn_declarator . ac_compound_statement
+
+    error  shift, and go to state 167
+    '{'    shift, and go to state 168
+
+    MainCbody              go to state 169
+    ac_compound_statement  go to state 170
+
+
+state 92
+
+  302 ac_fn_declarator: ac_direct_fn_declarator .
+
+    $default  reduce using rule 302 (ac_fn_declarator)
+
+
+state 93
+
+  325 ac_direct_fn_declarator: ac_qualifier . '(' ac_parameter_type_list ')' ac_opt_const
+  326                        | ac_qualifier . '(' error ')' ac_opt_const
+  328 ac_qualifier: ac_qualifier . T_COLONCOLON ac_fn_declarator_id
+
+    T_COLONCOLON  shift, and go to state 171
+    '('           shift, and go to state 172
+
+
+state 94
+
+  327 ac_qualifier: ac_fn_declarator_id .
+
+    $default  reduce using rule 327 (ac_qualifier)
+
+
+state 95
+
+  303 ac_fn_declarator: ac_pointer . ac_direct_fn_declarator
+  305                 | ac_pointer . '&' ac_direct_fn_declarator
+
+    T_ID        shift, and go to state 6
+    T_OPERATOR  shift, and go to state 87
+    '&'         shift, and go to state 173
+
+    id                       go to state 90
+    ac_direct_fn_declarator  go to state 174
+    ac_qualifier             go to state 93
+    ac_fn_declarator_id      go to state 94
+
+
+state 96
+
+  282 ac_declaration_specifiers: ac_storage_class_specifier ac_type_specifier .
+
+    $default  reduce using rule 282 (ac_declaration_specifiers)
+
+
+state 97
+
+  284 ac_declaration_specifiers: ac_storage_class_specifier ac_type_qualifier . ac_type_specifier
+
+    T_ID  shift, and go to state 6
+
+    id                 go to state 70
+    ac_type_specifier  go to state 175
+
+
+state 98
+
+  283 ac_declaration_specifiers: ac_type_qualifier ac_type_specifier .
+
+    $default  reduce using rule 283 (ac_declaration_specifiers)
+
+
+state 99
+
+  129 includedeclaration: T_INCLUDESTART error T_INCLUDEEND .
+
+    $default  reduce using rule 129 (includedeclaration)
+
+
+state 100
+
+  128 includedeclaration: T_INCLUDESTART includefiles_option @26 . T_ENDOFINCLUDESTART T_INCLUDEEND
+
+    T_ENDOFINCLUDESTART  shift, and go to state 176
+
+
+state 101
+
+  133 includefiles: includefiles T_ID .
+
+    $default  reduce using rule 133 (includefiles)
+
+
+state 102
+
+  164 provideds: T_PROVIDED '(' . @29 Cexpression @30 ')'
+
+    $default  reduce using rule 162 (@29)
+
+    @29  go to state 177
+
+
+state 103
+
+  249 rviewdeclaration: T_PERCENTRVIEW error ';' .
+
+    $default  reduce using rule 249 (rviewdeclaration)
+
+
+state 104
+
+  251 defrviewnames: '(' id . ')'
+
+    ')'  shift, and go to state 178
+
+
+state 105
+
+  256 defrviewnames: defrviewnames error .
+
+    $default  reduce using rule 256 (defrviewnames)
+
+
+state 106
+
+  248 rviewdeclaration: T_PERCENTRVIEW defrviewnames ';' .
+
+    $default  reduce using rule 248 (rviewdeclaration)
+
+
+state 107
+
+  254 defrviewnames: defrviewnames ',' . id
+  255              | defrviewnames ',' . '(' id ')'
+  257              | defrviewnames ',' . error
+
+    error  shift, and go to state 179
+    T_ID   shift, and go to state 6
+    '('    shift, and go to state 180
+
+    id  go to state 181
+
+
+state 108
+
+  253 defrviewnames: defrviewnames '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 182
+
+
+state 109
+
+  252 defrviewnames: defrviewnames id .
+
+    $default  reduce using rule 252 (defrviewnames)
+
+
+state 110
+
+  239 uviewdeclaration: T_PERCENTUVIEW error ';' .
+
+    $default  reduce using rule 239 (uviewdeclaration)
+
+
+state 111
+
+  241 defuviewnames: '(' id . ')'
+
+    ')'  shift, and go to state 183
+
+
+state 112
+
+  246 defuviewnames: defuviewnames error .
+
+    $default  reduce using rule 246 (defuviewnames)
+
+
+state 113
+
+  238 uviewdeclaration: T_PERCENTUVIEW defuviewnames ';' .
+
+    $default  reduce using rule 238 (uviewdeclaration)
+
+
+state 114
+
+  244 defuviewnames: defuviewnames ',' . id
+  245              | defuviewnames ',' . '(' id ')'
+  247              | defuviewnames ',' . error
+
+    error  shift, and go to state 184
+    T_ID   shift, and go to state 6
+    '('    shift, and go to state 185
+
+    id  go to state 186
+
+
+state 115
+
+  243 defuviewnames: defuviewnames '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 187
+
+
+state 116
+
+  242 defuviewnames: defuviewnames id .
+
+    $default  reduce using rule 242 (defuviewnames)
+
+
+state 117
+
+  259 storageclassdeclaration: T_PERCENTSTORAGECLASS error ';' .
+
+    $default  reduce using rule 259 (storageclassdeclaration)
+
+
+state 118
+
+  263 defstorageclasses: defstorageclasses error .
+
+    $default  reduce using rule 263 (defstorageclasses)
+
+
+state 119
+
+  258 storageclassdeclaration: T_PERCENTSTORAGECLASS defstorageclasses ';' .
+
+    $default  reduce using rule 258 (storageclassdeclaration)
+
+
+state 120
+
+  262 defstorageclasses: defstorageclasses ',' . id
+  264                  | defstorageclasses ',' . error
+
+    error  shift, and go to state 188
+    T_ID   shift, and go to state 6
+
+    id  go to state 189
+
+
+state 121
+
+  261 defstorageclasses: defstorageclasses id .
+
+    $default  reduce using rule 261 (defstorageclasses)
+
+
+state 122
+
+  373 languagedeclaration: T_PERCENTLANGUAGE error ';' .
+
+    $default  reduce using rule 373 (languagedeclaration)
+
+
+state 123
+
+  377 deflanguagenames: deflanguagenames error .
+
+    $default  reduce using rule 377 (deflanguagenames)
+
+
+state 124
+
+  372 languagedeclaration: T_PERCENTLANGUAGE deflanguagenames ';' .
+
+    $default  reduce using rule 372 (languagedeclaration)
+
+
+state 125
+
+  376 deflanguagenames: deflanguagenames ',' . id
+  378                 | deflanguagenames ',' . error
+
+    error  shift, and go to state 190
+    T_ID   shift, and go to state 6
+
+    id  go to state 191
+
+
+state 126
+
+  375 deflanguagenames: deflanguagenames id .
+
+    $default  reduce using rule 375 (deflanguagenames)
+
+
+state 127
+
+  267 ac_function_definition: T_CONSTRUCTOR id '(' . ac_parameter_type_list ')' ac_opt_base_init_list ac_compound_statement
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+
+    $default  reduce using rule 339 (ac_parameter_type_list)
+
+    id                          go to state 70
+    ac_declaration_specifiers   go to state 193
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    ac_parameter_type_list      go to state 194
+    ac_parameter_list           go to state 195
+    ac_parameter_declaration    go to state 196
+
+
+state 128
+
+  268 ac_function_definition: T_DESTRUCTOR opt_virtual id . '(' ')' ac_compound_statement
+
+    '('  shift, and go to state 197
+
+
+state 129
+
+  312 ac_member_declarator: '&' . ac_direct_member_declarator
+
+    T_ID  shift, and go to state 6
+
+    id                           go to state 130
+    ac_direct_member_declarator  go to state 198
+
+
+state 130
+
+  320 ac_direct_member_declarator: id . T_COLONCOLON id ac_constant_expression_list
+
+    T_COLONCOLON  shift, and go to state 199
+
+
+state 131
+
+  269 ac_function_definition: T_MEMBER ac_member_declaration_specifiers ac_member_declarator . ac_opt_member_init ';'
+
+    '('  shift, and go to state 200
+    '='  shift, and go to state 201
+
+    $default  reduce using rule 278 (ac_opt_member_init)
+
+    ac_opt_member_init  go to state 202
+
+
+state 132
+
+  310 ac_member_declarator: ac_direct_member_declarator .
+
+    $default  reduce using rule 310 (ac_member_declarator)
+
+
+state 133
+
+  311 ac_member_declarator: ac_pointer . ac_direct_member_declarator
+  313                     | ac_pointer . '&' ac_direct_member_declarator
+
+    T_ID  shift, and go to state 6
+    '&'   shift, and go to state 203
+
+    id                           go to state 130
+    ac_direct_member_declarator  go to state 204
+
+
+state 134
+
+  286 ac_member_declaration_specifiers: ac_member_storage_class_specifier ac_type_specifier .
+
+    $default  reduce using rule 286 (ac_member_declaration_specifiers)
+
+
+state 135
+
+  288 ac_member_declaration_specifiers: ac_member_storage_class_specifier ac_type_qualifier . ac_type_specifier
+
+    T_ID  shift, and go to state 6
+
+    id                 go to state 70
+    ac_type_specifier  go to state 205
+
+
+state 136
+
+  287 ac_member_declaration_specifiers: ac_type_qualifier ac_type_specifier .
+
+    $default  reduce using rule 287 (ac_member_declaration_specifiers)
+
+
+state 137
+
+  270 ac_function_definition: T_ATTR ac_member_declaration_specifiers ac_member_declarator . ac_opt_member_init ';'
+
+    '('  shift, and go to state 200
+    '='  shift, and go to state 201
+
+    $default  reduce using rule 278 (ac_opt_member_init)
+
+    ac_opt_member_init  go to state 206
+
+
+state 138
+
+   18 baseclassdeclaration: T_BASECLASS id ':' . baseclass_list ';'
+
+    T_ID  shift, and go to state 6
+
+    id              go to state 207
+    baseclass_list  go to state 208
+
+
+state 139
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR . id '(' ')' ac_opt_const ac_compound_statement
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 209
+
+
+state 140
+
+   26 storageoption: '{' error .
+
+    $default  reduce using rule 26 (storageoption)
+
+
+state 141
+
+   25 storageoption: '{' '!' . id '}'
+   27              | '{' '!' . error
+
+    error  shift, and go to state 210
+    T_ID   shift, and go to state 6
+
+    id  go to state 211
+
+
+state 142
+
+   24 storageoption: '{' id . '}'
+
+    '}'  shift, and go to state 212
+
+
+state 143
+
+  177 patterns: error .
+
+    $default  reduce using rule 177 (patterns)
+
+
+state 144
+
+    3 integer: T_INT .
+
+    $default  reduce using rule 3 (integer)
+
+
+state 145
+
+  168 pattern: T_DEFAULT .
+
+    $default  reduce using rule 168 (pattern)
+
+
+state 146
+
+  171 pattern: '"' . @31 CexpressionDQ '"'
+
+    $default  reduce using rule 170 (@31)
+
+    @31  go to state 213
+
+
+state 147
+
+  167 pattern: '*' .
+
+    $default  reduce using rule 167 (pattern)
+
+
+state 148
+
+  165 pattern: id .
+  166        | id . '(' patternsoption ')'
+  169        | id . '=' pattern
+
+    '('  shift, and go to state 214
+    '='  shift, and go to state 215
+
+    $default  reduce using rule 165 (pattern)
+
+
+state 149
+
+  172 pattern: integer .
+
+    $default  reduce using rule 172 (pattern)
+
+
+state 150
+
+  175 patterns: pattern .
+
+    $default  reduce using rule 175 (patterns)
+
+
+state 151
+
+  157 outmostpattern: id '(' patternsoption . ')' provideds
+
+    ')'  shift, and go to state 216
+
+
+state 152
+
+  174 patternsoption: patterns .
+  176 patterns: patterns . ',' pattern
+  178         | patterns . error
+  179         | patterns . ',' error
+  180         | patterns . error pattern
+
+    error  shift, and go to state 217
+    ','    shift, and go to state 218
+
+    ')'  reduce using rule 174 (patternsoption)
+
+
+state 153
+
+  156 outmostpattern: id . provideds
+  157               | id . '(' patternsoption ')' provideds
+  158               | id . '=' outmostpattern
+
+    T_PROVIDED  shift, and go to state 50
+    '('         shift, and go to state 80
+    '='         shift, and go to state 81
+
+    $default  reduce using rule 161 (provideds)
+
+    provideds  go to state 83
+
+
+state 154
+
+  158 outmostpattern: id '=' outmostpattern .
+
+    $default  reduce using rule 158 (outmostpattern)
+
+
+state 155
+
+   22 phylumdeclaration: id storageoption ':' . @2 productionblock Ccode_option ';'
+
+    $default  reduce using rule 21 (@2)
+
+    @2  go to state 219
+
+
+state 156
+
+  155 outmostpatterns: outmostpatterns error outmostpattern .
+
+    $default  reduce using rule 155 (outmostpatterns)
+
+
+state 157
+
+  205 unparsedeclaration: outmostpatterns T_ARROW error . ';'
+
+    ';'  shift, and go to state 220
+
+
+state 158
+
+  135 rwdeclaration: outmostpatterns T_ARROW @27 . rwclauses semi_or_error
+
+    '<'  shift, and go to state 221
+
+    rwclauses  go to state 222
+    rwclause   go to state 223
+
+
+state 159
+
+  204 unparsedeclaration: outmostpatterns T_ARROW @34 . unparseclauses ';'
+
+    '['  shift, and go to state 224
+
+    unparseclauses  go to state 225
+    unparseclause   go to state 226
+
+
+state 160
+
+  154 outmostpatterns: outmostpatterns ',' error .
+
+    $default  reduce using rule 154 (outmostpatterns)
+
+
+state 161
+
+  151 outmostpatterns: outmostpatterns ',' outmostpattern .
+
+    $default  reduce using rule 151 (outmostpatterns)
+
+
+state 162
+
+  330 ac_fn_declarator_id: T_OPERATOR T_OPNAME .
+
+    $default  reduce using rule 330 (ac_fn_declarator_id)
+
+
+state 163
+
+  304 ac_fn_declarator: '&' ac_direct_fn_declarator .
+
+    $default  reduce using rule 304 (ac_fn_declarator)
+
+
+state 164
+
+  337 ac_type_qualifier_list: ac_type_qualifier .
+
+    $default  reduce using rule 337 (ac_type_qualifier_list)
+
+
+state 165
+
+  335 ac_pointer: '*' ac_pointer .
+
+    $default  reduce using rule 335 (ac_pointer)
+
+
+state 166
+
+  334 ac_pointer: '*' ac_type_qualifier_list .
+  336           | '*' ac_type_qualifier_list . ac_pointer
+  338 ac_type_qualifier_list: ac_type_qualifier_list . ac_type_qualifier
+
+    T_CONST     shift, and go to state 18
+    T_VOLATILE  shift, and go to state 19
+    T_UNSIGNED  shift, and go to state 20
+    '*'         shift, and go to state 89
+
+    $default  reduce using rule 334 (ac_pointer)
+
+    ac_type_qualifier  go to state 227
+    ac_pointer         go to state 228
+
+
+state 167
+
+  363 ac_compound_statement: error . ';' @40 ac_compound_statement
+
+    ';'  shift, and go to state 229
+
+
+state 168
+
+   90 MainCbody: '{' . @9 MainCBodycontinuation @10 '}'
+
+    $default  reduce using rule 88 (@9)
+
+    @9  go to state 230
+
+
+state 169
+
+  361 ac_compound_statement: MainCbody .
+
+    $default  reduce using rule 361 (ac_compound_statement)
+
+
+state 170
+
+  265 ac_function_definition: ac_declaration_specifiers ac_fn_declarator ac_compound_statement .
+
+    $default  reduce using rule 265 (ac_function_definition)
+
+
+state 171
+
+  328 ac_qualifier: ac_qualifier T_COLONCOLON . ac_fn_declarator_id
+
+    T_ID        shift, and go to state 6
+    T_OPERATOR  shift, and go to state 87
+
+    id                   go to state 90
+    ac_fn_declarator_id  go to state 231
+
+
+state 172
+
+  325 ac_direct_fn_declarator: ac_qualifier '(' . ac_parameter_type_list ')' ac_opt_const
+  326                        | ac_qualifier '(' . error ')' ac_opt_const
+
+    error        shift, and go to state 232
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+
+    ')'  reduce using rule 339 (ac_parameter_type_list)
+
+    id                          go to state 70
+    ac_declaration_specifiers   go to state 193
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    ac_parameter_type_list      go to state 233
+    ac_parameter_list           go to state 195
+    ac_parameter_declaration    go to state 196
+
+
+state 173
+
+  305 ac_fn_declarator: ac_pointer '&' . ac_direct_fn_declarator
+
+    T_ID        shift, and go to state 6
+    T_OPERATOR  shift, and go to state 87
+
+    id                       go to state 90
+    ac_direct_fn_declarator  go to state 234
+    ac_qualifier             go to state 93
+    ac_fn_declarator_id      go to state 94
+
+
+state 174
+
+  303 ac_fn_declarator: ac_pointer ac_direct_fn_declarator .
+
+    $default  reduce using rule 303 (ac_fn_declarator)
+
+
+state 175
+
+  284 ac_declaration_specifiers: ac_storage_class_specifier ac_type_qualifier ac_type_specifier .
+
+    $default  reduce using rule 284 (ac_declaration_specifiers)
+
+
+state 176
+
+  128 includedeclaration: T_INCLUDESTART includefiles_option @26 T_ENDOFINCLUDESTART . T_INCLUDEEND
+
+    T_INCLUDEEND  shift, and go to state 235
+
+
+state 177
+
+  164 provideds: T_PROVIDED '(' @29 . Cexpression @30 ')'
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression  go to state 236
+
+
+state 178
+
+  251 defrviewnames: '(' id ')' .
+
+    $default  reduce using rule 251 (defrviewnames)
+
+
+state 179
+
+  257 defrviewnames: defrviewnames ',' error .
+
+    $default  reduce using rule 257 (defrviewnames)
+
+
+state 180
+
+  255 defrviewnames: defrviewnames ',' '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 237
+
+
+state 181
+
+  254 defrviewnames: defrviewnames ',' id .
+
+    $default  reduce using rule 254 (defrviewnames)
+
+
+state 182
+
+  253 defrviewnames: defrviewnames '(' id . ')'
+
+    ')'  shift, and go to state 238
+
+
+state 183
+
+  241 defuviewnames: '(' id ')' .
+
+    $default  reduce using rule 241 (defuviewnames)
+
+
+state 184
+
+  247 defuviewnames: defuviewnames ',' error .
+
+    $default  reduce using rule 247 (defuviewnames)
+
+
+state 185
+
+  245 defuviewnames: defuviewnames ',' '(' . id ')'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 239
+
+
+state 186
+
+  244 defuviewnames: defuviewnames ',' id .
+
+    $default  reduce using rule 244 (defuviewnames)
+
+
+state 187
+
+  243 defuviewnames: defuviewnames '(' id . ')'
+
+    ')'  shift, and go to state 240
+
+
+state 188
+
+  264 defstorageclasses: defstorageclasses ',' error .
+
+    $default  reduce using rule 264 (defstorageclasses)
+
+
+state 189
+
+  262 defstorageclasses: defstorageclasses ',' id .
+
+    $default  reduce using rule 262 (defstorageclasses)
+
+
+state 190
+
+  378 deflanguagenames: deflanguagenames ',' error .
+
+    $default  reduce using rule 378 (deflanguagenames)
+
+
+state 191
+
+  376 deflanguagenames: deflanguagenames ',' id .
+
+    $default  reduce using rule 376 (deflanguagenames)
+
+
+state 192
+
+  340 ac_parameter_type_list: T_DOTDOTDOT .
+
+    $default  reduce using rule 340 (ac_parameter_type_list)
+
+
+state 193
+
+  346 ac_parameter_declaration: ac_declaration_specifiers . ac_declarator ac_default_arg_init
+  347                         | ac_declaration_specifiers . ac_abstract_declarator ac_default_arg_init
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 241
+    '['   shift, and go to state 242
+    '&'   shift, and go to state 243
+    '$'   shift, and go to state 244
+    '*'   shift, and go to state 89
+
+    id                             go to state 245
+    ac_declarator                  go to state 246
+    ac_direct_declarator           go to state 247
+    ac_pointer                     go to state 248
+    ac_abstract_declarator         go to state 249
+    ac_direct_abstract_declarator  go to state 250
+    ac_identifier                  go to state 251
+
+
+state 194
+
+  267 ac_function_definition: T_CONSTRUCTOR id '(' ac_parameter_type_list . ')' ac_opt_base_init_list ac_compound_statement
+
+    ')'  shift, and go to state 252
+
+
+state 195
+
+  341 ac_parameter_type_list: ac_parameter_list .
+  342                       | ac_parameter_list . T_DOTDOTDOT
+  343                       | ac_parameter_list . ',' T_DOTDOTDOT
+  345 ac_parameter_list: ac_parameter_list . ',' ac_parameter_declaration
+
+    T_DOTDOTDOT  shift, and go to state 253
+    ','          shift, and go to state 254
+
+    $default  reduce using rule 341 (ac_parameter_type_list)
+
+
+state 196
+
+  344 ac_parameter_list: ac_parameter_declaration .
+
+    $default  reduce using rule 344 (ac_parameter_list)
+
+
+state 197
+
+  268 ac_function_definition: T_DESTRUCTOR opt_virtual id '(' . ')' ac_compound_statement
+
+    ')'  shift, and go to state 255
+
+
+state 198
+
+  312 ac_member_declarator: '&' ac_direct_member_declarator .
+
+    $default  reduce using rule 312 (ac_member_declarator)
+
+
+state 199
+
+  320 ac_direct_member_declarator: id T_COLONCOLON . id ac_constant_expression_list
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 256
+
+
+state 200
+
+  280 ac_opt_member_init: '(' . ac_constant_expression ')'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression  go to state 257
+    @39                     go to state 258
+
+
+state 201
+
+  279 ac_opt_member_init: '=' . ac_constant_expression
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression  go to state 259
+    @39                     go to state 258
+
+
+state 202
+
+  269 ac_function_definition: T_MEMBER ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init . ';'
+
+    ';'  shift, and go to state 260
+
+
+state 203
+
+  313 ac_member_declarator: ac_pointer '&' . ac_direct_member_declarator
+
+    T_ID  shift, and go to state 6
+
+    id                           go to state 130
+    ac_direct_member_declarator  go to state 261
+
+
+state 204
+
+  311 ac_member_declarator: ac_pointer ac_direct_member_declarator .
+
+    $default  reduce using rule 311 (ac_member_declarator)
+
+
+state 205
+
+  288 ac_member_declaration_specifiers: ac_member_storage_class_specifier ac_type_qualifier ac_type_specifier .
+
+    $default  reduce using rule 288 (ac_member_declaration_specifiers)
+
+
+state 206
+
+  270 ac_function_definition: T_ATTR ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init . ';'
+
+    ';'  shift, and go to state 262
+
+
+state 207
+
+   19 baseclass_list: id .
+
+    $default  reduce using rule 19 (baseclass_list)
+
+
+state 208
+
+   18 baseclassdeclaration: T_BASECLASS id ':' baseclass_list . ';'
+   20 baseclass_list: baseclass_list . ',' id
+
+    ';'  shift, and go to state 263
+    ','  shift, and go to state 264
+
+
+state 209
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR id . '(' ')' ac_opt_const ac_compound_statement
+
+    '('  shift, and go to state 265
+
+
+state 210
+
+   27 storageoption: '{' '!' error .
+
+    $default  reduce using rule 27 (storageoption)
+
+
+state 211
+
+   25 storageoption: '{' '!' id . '}'
+
+    '}'  shift, and go to state 266
+
+
+state 212
+
+   24 storageoption: '{' id '}' .
+
+    $default  reduce using rule 24 (storageoption)
+
+
+state 213
+
+  171 pattern: '"' @31 . CexpressionDQ '"'
+
+    $default  reduce using rule 71 (CexpressionDQ)
+
+    CexpressionDQ  go to state 267
+
+
+state 214
+
+  166 pattern: id '(' . patternsoption ')'
+
+    error      shift, and go to state 143
+    T_ID       shift, and go to state 6
+    T_INT      shift, and go to state 144
+    T_DEFAULT  shift, and go to state 145
+    '"'        shift, and go to state 146
+    '*'        shift, and go to state 147
+
+    ')'  reduce using rule 173 (patternsoption)
+
+    id              go to state 148
+    integer         go to state 149
+    pattern         go to state 150
+    patternsoption  go to state 268
+    patterns        go to state 152
+
+
+state 215
+
+  169 pattern: id '=' . pattern
+
+    T_ID       shift, and go to state 6
+    T_INT      shift, and go to state 144
+    T_DEFAULT  shift, and go to state 145
+    '"'        shift, and go to state 146
+    '*'        shift, and go to state 147
+
+    id       go to state 148
+    integer  go to state 149
+    pattern  go to state 269
+
+
+state 216
+
+  157 outmostpattern: id '(' patternsoption ')' . provideds
+
+    T_PROVIDED  shift, and go to state 50
+
+    $default  reduce using rule 161 (provideds)
+
+    provideds  go to state 270
+
+
+state 217
+
+  178 patterns: patterns error .
+  180         | patterns error . pattern
+
+    T_ID       shift, and go to state 6
+    T_INT      shift, and go to state 144
+    T_DEFAULT  shift, and go to state 145
+    '"'        shift, and go to state 146
+    '*'        shift, and go to state 147
+
+    $default  reduce using rule 178 (patterns)
+
+    id       go to state 148
+    integer  go to state 149
+    pattern  go to state 271
+
+
+state 218
+
+  176 patterns: patterns ',' . pattern
+  179         | patterns ',' . error
+
+    error      shift, and go to state 272
+    T_ID       shift, and go to state 6
+    T_INT      shift, and go to state 144
+    T_DEFAULT  shift, and go to state 145
+    '"'        shift, and go to state 146
+    '*'        shift, and go to state 147
+
+    id       go to state 148
+    integer  go to state 149
+    pattern  go to state 273
+
+
+state 219
+
+   22 phylumdeclaration: id storageoption ':' @2 . productionblock Ccode_option ';'
+
+    error   shift, and go to state 274
+    T_ID    shift, and go to state 6
+    T_LIST  shift, and go to state 275
+
+    ';'  reduce using rule 28 (productionblock)
+    '{'  reduce using rule 28 (productionblock)
+
+    id               go to state 276
+    productionblock  go to state 277
+    alternatives     go to state 278
+    alternative      go to state 279
+
+
+state 220
+
+  205 unparsedeclaration: outmostpatterns T_ARROW error ';' .
+
+    $default  reduce using rule 205 (unparsedeclaration)
+
+
+state 221
+
+  138 rwclause: '<' . useviewnames ':' term '>'
+
+    $default  reduce using rule 213 (useviewnames)
+
+    useviewnames  go to state 280
+
+
+state 222
+
+  135 rwdeclaration: outmostpatterns T_ARROW @27 rwclauses . semi_or_error
+  137 rwclauses: rwclauses . rwclause
+
+    error  shift, and go to state 281
+    ';'    shift, and go to state 282
+    '<'    shift, and go to state 221
+
+    rwclause       go to state 283
+    semi_or_error  go to state 284
+
+
+state 223
+
+  136 rwclauses: rwclause .
+
+    $default  reduce using rule 136 (rwclauses)
+
+
+state 224
+
+  208 unparseclause: '[' . useviewnames ':' unparseitems ']'
+  209              | '[' . useviewnames ':' error
+  210              | '[' . error ':' unparseitems ']'
+  211              | '[' . error ':' error
+  212              | '[' . error
+
+    error  shift, and go to state 285
+
+    T_ID  reduce using rule 213 (useviewnames)
+    ':'   reduce using rule 213 (useviewnames)
+
+    useviewnames  go to state 286
+
+
+state 225
+
+  204 unparsedeclaration: outmostpatterns T_ARROW @34 unparseclauses . ';'
+  207 unparseclauses: unparseclauses . unparseclause
+
+    ';'  shift, and go to state 287
+    '['  shift, and go to state 224
+
+    unparseclause  go to state 288
+
+
+state 226
+
+  206 unparseclauses: unparseclause .
+
+    $default  reduce using rule 206 (unparseclauses)
+
+
+state 227
+
+  338 ac_type_qualifier_list: ac_type_qualifier_list ac_type_qualifier .
+
+    $default  reduce using rule 338 (ac_type_qualifier_list)
+
+
+state 228
+
+  336 ac_pointer: '*' ac_type_qualifier_list ac_pointer .
+
+    $default  reduce using rule 336 (ac_pointer)
+
+
+state 229
+
+  363 ac_compound_statement: error ';' . @40 ac_compound_statement
+
+    $default  reduce using rule 362 (@40)
+
+    @40  go to state 289
+
+
+state 230
+
+   90 MainCbody: '{' @9 . MainCBodycontinuation @10 '}'
+
+    error  shift, and go to state 290
+
+    T_ID         reduce using rule 145 (@28)
+    T_CNEWLINES  reduce using rule 100 (Ctext)
+    T_CLINE      reduce using rule 100 (Ctext)
+    T_DOLLARVAR  reduce using rule 100 (Ctext)
+    T_WITH       reduce using rule 100 (Ctext)
+    T_FOREACH    reduce using rule 100 (Ctext)
+    T_DEFAULT    reduce using rule 145 (@28)
+    '{'          reduce using rule 100 (Ctext)
+    '}'          reduce using rule 100 (Ctext)
+    '('          reduce using rule 145 (@28)
+    '\n'         reduce using rule 100 (Ctext)
+    '"'          reduce using rule 100 (Ctext)
+    '''          reduce using rule 100 (Ctext)
+    '$'          reduce using rule 145 (@28)
+    '*'          reduce using rule 145 (@28)
+
+    MainCBodycontinuation      go to state 291
+    Ctext                      go to state 292
+    patternchains              go to state 293
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+    withcases                  go to state 297
+    withcase                   go to state 298
+
+
+state 231
+
+  328 ac_qualifier: ac_qualifier T_COLONCOLON ac_fn_declarator_id .
+
+    $default  reduce using rule 328 (ac_qualifier)
+
+
+state 232
+
+  326 ac_direct_fn_declarator: ac_qualifier '(' error . ')' ac_opt_const
+
+    ')'  shift, and go to state 299
+
+
+state 233
+
+  325 ac_direct_fn_declarator: ac_qualifier '(' ac_parameter_type_list . ')' ac_opt_const
+
+    ')'  shift, and go to state 300
+
+
+state 234
+
+  305 ac_fn_declarator: ac_pointer '&' ac_direct_fn_declarator .
+
+    $default  reduce using rule 305 (ac_fn_declarator)
+
+
+state 235
+
+  128 includedeclaration: T_INCLUDESTART includefiles_option @26 T_ENDOFINCLUDESTART T_INCLUDEEND .
+
+    $default  reduce using rule 128 (includedeclaration)
+
+
+state 236
+
+   53 Cexpression: Cexpression . Cexpression_elem
+  164 provideds: T_PROVIDED '(' @29 Cexpression . @30 ')'
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 163 (@30)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+    @30               go to state 310
+
+
+state 237
+
+  255 defrviewnames: defrviewnames ',' '(' id . ')'
+
+    ')'  shift, and go to state 311
+
+
+state 238
+
+  253 defrviewnames: defrviewnames '(' id ')' .
+
+    $default  reduce using rule 253 (defrviewnames)
+
+
+state 239
+
+  245 defuviewnames: defuviewnames ',' '(' id . ')'
+
+    ')'  shift, and go to state 312
+
+
+state 240
+
+  243 defuviewnames: defuviewnames '(' id ')' .
+
+    $default  reduce using rule 243 (defuviewnames)
+
+
+state 241
+
+  317 ac_direct_declarator: '(' . ac_pointer_declarator ')'
+  351 ac_direct_abstract_declarator: '(' . ac_abstract_declarator ')'
+  355                              | '(' . ac_parameter_type_list ')'
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+    '('          shift, and go to state 313
+    '['          shift, and go to state 242
+    '*'          shift, and go to state 89
+
+    $default  reduce using rule 339 (ac_parameter_type_list)
+
+    id                             go to state 70
+    ac_declaration_specifiers      go to state 193
+    ac_storage_class_specifier     go to state 42
+    ac_type_specifier              go to state 43
+    ac_type_qualifier              go to state 44
+    ac_pointer_declarator          go to state 314
+    ac_pointer                     go to state 315
+    ac_parameter_type_list         go to state 316
+    ac_parameter_list              go to state 195
+    ac_parameter_declaration       go to state 196
+    ac_abstract_declarator         go to state 317
+    ac_direct_abstract_declarator  go to state 250
+
+
+state 242
+
+  353 ac_direct_abstract_declarator: '[' . ac_constant_expression_option ']'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression_option  go to state 318
+    ac_constant_expression         go to state 319
+    @39                            go to state 258
+
+
+state 243
+
+  308 ac_declarator: '&' . ac_direct_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 320
+    '$'   shift, and go to state 244
+
+    id                    go to state 245
+    ac_direct_declarator  go to state 321
+    ac_identifier         go to state 251
+
+
+state 244
+
+  360 ac_identifier: '$' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 322
+
+
+state 245
+
+  359 ac_identifier: id .
+
+    $default  reduce using rule 359 (ac_identifier)
+
+
+state 246
+
+  346 ac_parameter_declaration: ac_declaration_specifiers ac_declarator . ac_default_arg_init
+
+    '='  shift, and go to state 323
+
+    $default  reduce using rule 276 (ac_default_arg_init)
+
+    ac_default_arg_init  go to state 324
+
+
+state 247
+
+  306 ac_declarator: ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 306 (ac_declarator)
+
+
+state 248
+
+  307 ac_declarator: ac_pointer . ac_direct_declarator
+  309              | ac_pointer . '&' ac_direct_declarator
+  348 ac_abstract_declarator: ac_pointer .
+  350                       | ac_pointer . ac_direct_abstract_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 241
+    '['   shift, and go to state 242
+    '&'   shift, and go to state 327
+    '$'   shift, and go to state 244
+
+    $default  reduce using rule 348 (ac_abstract_declarator)
+
+    id                             go to state 245
+    ac_direct_declarator           go to state 328
+    ac_direct_abstract_declarator  go to state 329
+    ac_identifier                  go to state 251
+
+
+state 249
+
+  347 ac_parameter_declaration: ac_declaration_specifiers ac_abstract_declarator . ac_default_arg_init
+
+    '='  shift, and go to state 323
+
+    $default  reduce using rule 276 (ac_default_arg_init)
+
+    ac_default_arg_init  go to state 330
+
+
+state 250
+
+  349 ac_abstract_declarator: ac_direct_abstract_declarator .
+  352 ac_direct_abstract_declarator: ac_direct_abstract_declarator . '[' ac_constant_expression_option ']'
+  354                              | ac_direct_abstract_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 331
+    '['  shift, and go to state 332
+
+    $default  reduce using rule 349 (ac_abstract_declarator)
+
+
+state 251
+
+  316 ac_direct_declarator: ac_identifier .
+
+    $default  reduce using rule 316 (ac_direct_declarator)
+
+
+state 252
+
+  267 ac_function_definition: T_CONSTRUCTOR id '(' ac_parameter_type_list ')' . ac_opt_base_init_list ac_compound_statement
+
+    ':'  shift, and go to state 333
+
+    $default  reduce using rule 271 (ac_opt_base_init_list)
+
+    ac_opt_base_init_list  go to state 334
+
+
+state 253
+
+  342 ac_parameter_type_list: ac_parameter_list T_DOTDOTDOT .
+
+    $default  reduce using rule 342 (ac_parameter_type_list)
+
+
+state 254
+
+  343 ac_parameter_type_list: ac_parameter_list ',' . T_DOTDOTDOT
+  345 ac_parameter_list: ac_parameter_list ',' . ac_parameter_declaration
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 335
+
+    id                          go to state 70
+    ac_declaration_specifiers   go to state 193
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    ac_parameter_declaration    go to state 336
+
+
+state 255
+
+  268 ac_function_definition: T_DESTRUCTOR opt_virtual id '(' ')' . ac_compound_statement
+
+    error  shift, and go to state 167
+    '{'    shift, and go to state 168
+
+    MainCbody              go to state 169
+    ac_compound_statement  go to state 337
+
+
+state 256
+
+  320 ac_direct_member_declarator: id T_COLONCOLON id . ac_constant_expression_list
+
+    $default  reduce using rule 321 (ac_constant_expression_list)
+
+    ac_constant_expression_list  go to state 338
+
+
+state 257
+
+  280 ac_opt_member_init: '(' ac_constant_expression . ')'
+
+    ')'  shift, and go to state 339
+
+
+state 258
+
+  358 ac_constant_expression: @39 . Cexpression
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression  go to state 340
+
+
+state 259
+
+  279 ac_opt_member_init: '=' ac_constant_expression .
+
+    $default  reduce using rule 279 (ac_opt_member_init)
+
+
+state 260
+
+  269 ac_function_definition: T_MEMBER ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';' .
+
+    $default  reduce using rule 269 (ac_function_definition)
+
+
+state 261
+
+  313 ac_member_declarator: ac_pointer '&' ac_direct_member_declarator .
+
+    $default  reduce using rule 313 (ac_member_declarator)
+
+
+state 262
+
+  270 ac_function_definition: T_ATTR ac_member_declaration_specifiers ac_member_declarator ac_opt_member_init ';' .
+
+    $default  reduce using rule 270 (ac_function_definition)
+
+
+state 263
+
+   18 baseclassdeclaration: T_BASECLASS id ':' baseclass_list ';' .
+
+    $default  reduce using rule 18 (baseclassdeclaration)
+
+
+state 264
+
+   20 baseclass_list: baseclass_list ',' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 341
+
+
+state 265
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR id '(' . ')' ac_opt_const ac_compound_statement
+
+    ')'  shift, and go to state 342
+
+
+state 266
+
+   25 storageoption: '{' '!' id '}' .
+
+    $default  reduce using rule 25 (storageoption)
+
+
+state 267
+
+   72 CexpressionDQ: CexpressionDQ . CexpressionDQ_elem
+  171 pattern: '"' @31 CexpressionDQ . '"'
+
+    T_CEXPRESSION  shift, and go to state 343
+    '\n'           shift, and go to state 344
+    '"'            shift, and go to state 345
+
+    CexpressionDQ_elem  go to state 346
+
+
+state 268
+
+  166 pattern: id '(' patternsoption . ')'
+
+    ')'  shift, and go to state 347
+
+
+state 269
+
+  169 pattern: id '=' pattern .
+
+    $default  reduce using rule 169 (pattern)
+
+
+state 270
+
+  157 outmostpattern: id '(' patternsoption ')' provideds .
+
+    $default  reduce using rule 157 (outmostpattern)
+
+
+state 271
+
+  180 patterns: patterns error pattern .
+
+    $default  reduce using rule 180 (patterns)
+
+
+state 272
+
+  179 patterns: patterns ',' error .
+
+    $default  reduce using rule 179 (patterns)
+
+
+state 273
+
+  176 patterns: patterns ',' pattern .
+
+    $default  reduce using rule 176 (patterns)
+
+
+state 274
+
+   33 alternatives: error .
+
+    $default  reduce using rule 33 (alternatives)
+
+
+state 275
+
+   29 productionblock: T_LIST . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 348
+
+
+state 276
+
+   38 alternative: id . '(' @3 arguments @4 ')'
+   39            | id . '(' error
+
+    '('  shift, and go to state 349
+
+
+state 277
+
+   22 phylumdeclaration: id storageoption ':' @2 productionblock . Ccode_option ';'
+
+    '{'  shift, and go to state 350
+
+    $default  reduce using rule 43 (Ccode_option)
+
+    Ccode_option  go to state 351
+
+
+state 278
+
+   30 productionblock: alternatives .
+   32 alternatives: alternatives . '|' alternative
+   34             | alternatives . '|' error
+   35             | alternatives . error alternative
+
+    error  shift, and go to state 352
+    '|'    shift, and go to state 353
+
+    ';'  reduce using rule 30 (productionblock)
+    '{'  reduce using rule 30 (productionblock)
+
+
+state 279
+
+   31 alternatives: alternative .
+
+    $default  reduce using rule 31 (alternatives)
+
+
+state 280
+
+  138 rwclause: '<' useviewnames . ':' term '>'
+  214 useviewnames: useviewnames . id
+
+    T_ID  shift, and go to state 6
+    ':'   shift, and go to state 354
+
+    id  go to state 355
+
+
+state 281
+
+  140 semi_or_error: error .
+
+    $default  reduce using rule 140 (semi_or_error)
+
+
+state 282
+
+  139 semi_or_error: ';' .
+
+    $default  reduce using rule 139 (semi_or_error)
+
+
+state 283
+
+  137 rwclauses: rwclauses rwclause .
+
+    $default  reduce using rule 137 (rwclauses)
+
+
+state 284
+
+  135 rwdeclaration: outmostpatterns T_ARROW @27 rwclauses semi_or_error .
+
+    $default  reduce using rule 135 (rwdeclaration)
+
+
+state 285
+
+  210 unparseclause: '[' error . ':' unparseitems ']'
+  211              | '[' error . ':' error
+  212              | '[' error .
+
+    ':'  shift, and go to state 356
+
+    $default  reduce using rule 212 (unparseclause)
+
+
+state 286
+
+  208 unparseclause: '[' useviewnames . ':' unparseitems ']'
+  209              | '[' useviewnames . ':' error
+  214 useviewnames: useviewnames . id
+
+    T_ID  shift, and go to state 6
+    ':'   shift, and go to state 357
+
+    id  go to state 355
+
+
+state 287
+
+  204 unparsedeclaration: outmostpatterns T_ARROW @34 unparseclauses ';' .
+
+    $default  reduce using rule 204 (unparsedeclaration)
+
+
+state 288
+
+  207 unparseclauses: unparseclauses unparseclause .
+
+    $default  reduce using rule 207 (unparseclauses)
+
+
+state 289
+
+  363 ac_compound_statement: error ';' @40 . ac_compound_statement
+
+    error  shift, and go to state 167
+    '{'    shift, and go to state 168
+
+    MainCbody              go to state 169
+    ac_compound_statement  go to state 358
+
+
+state 290
+
+   96 MainCBodycontinuation: error .
+
+    $default  reduce using rule 96 (MainCBodycontinuation)
+
+
+state 291
+
+   90 MainCbody: '{' @9 MainCBodycontinuation . @10 '}'
+
+    $default  reduce using rule 89 (@10)
+
+    @10  go to state 359
+
+
+state 292
+
+   94 MainCBodycontinuation: Ctext .
+  102 Ctext: Ctext . @15 Ctext_elem
+
+    '}'       reduce using rule 94 (MainCBodycontinuation)
+    $default  reduce using rule 101 (@15)
+
+    @15  go to state 360
+
+
+state 293
+
+  142 patternchains: patternchains . ',' patternchain
+  202 withcase: patternchains . ':' Cbody
+
+    ':'  shift, and go to state 361
+    ','  shift, and go to state 362
+
+
+state 294
+
+  141 patternchains: patternchain .
+  144 patternchain: patternchain . '&' patternchainitem_lineinfo
+
+    '&'  shift, and go to state 363
+
+    $default  reduce using rule 141 (patternchains)
+
+
+state 295
+
+  143 patternchain: patternchainitem_lineinfo .
+
+    $default  reduce using rule 143 (patternchain)
+
+
+state 296
+
+  146 patternchainitem_lineinfo: @28 . patternchainitem
+
+    T_ID       shift, and go to state 6
+    T_DEFAULT  shift, and go to state 9
+    '('        shift, and go to state 364
+    '$'        shift, and go to state 365
+    '*'        shift, and go to state 27
+
+    id                go to state 153
+    patternchainitem  go to state 366
+    outmostpattern    go to state 367
+
+
+state 297
+
+   95 MainCBodycontinuation: withcases .
+  201 withcases: withcases . withcase
+
+    '}'       reduce using rule 95 (MainCBodycontinuation)
+    $default  reduce using rule 145 (@28)
+
+    patternchains              go to state 293
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+    withcase                   go to state 368
+
+
+state 298
+
+  200 withcases: withcase .
+
+    $default  reduce using rule 200 (withcases)
+
+
+state 299
+
+  326 ac_direct_fn_declarator: ac_qualifier '(' error ')' . ac_opt_const
+
+    T_CONST  shift, and go to state 369
+
+    $default  reduce using rule 331 (ac_opt_const)
+
+    ac_opt_const  go to state 370
+
+
+state 300
+
+  325 ac_direct_fn_declarator: ac_qualifier '(' ac_parameter_type_list ')' . ac_opt_const
+
+    T_CONST  shift, and go to state 369
+
+    $default  reduce using rule 331 (ac_opt_const)
+
+    ac_opt_const  go to state 371
+
+
+state 301
+
+   54 Cexpression_elem: T_CEXPRESSION .
+
+    $default  reduce using rule 54 (Cexpression_elem)
+
+
+state 302
+
+    1 dollarvar: T_DOLLARVAR .
+
+    $default  reduce using rule 1 (dollarvar)
+
+
+state 303
+
+   59 Cexpression_elem: '(' . Cexpression_inner ')'
+   63                 | '(' . error
+
+    error  shift, and go to state 372
+
+    T_CEXPRESSION  reduce using rule 65 (Cexpression_inner)
+    T_DOLLARVAR    reduce using rule 65 (Cexpression_inner)
+    ','            reduce using rule 65 (Cexpression_inner)
+    '('            reduce using rule 65 (Cexpression_inner)
+    ')'            reduce using rule 65 (Cexpression_inner)
+    '\n'           reduce using rule 65 (Cexpression_inner)
+    '"'            reduce using rule 65 (Cexpression_inner)
+    '''            reduce using rule 65 (Cexpression_inner)
+    '['            reduce using rule 65 (Cexpression_inner)
+
+    Cexpression_inner  go to state 373
+
+
+state 304
+
+   56 Cexpression_elem: '\n' .
+
+    $default  reduce using rule 56 (Cexpression_elem)
+
+
+state 305
+
+   57 Cexpression_elem: '"' . CexpressionDQ '"'
+   61                 | '"' . error
+
+    error  shift, and go to state 374
+
+    T_CEXPRESSION  reduce using rule 71 (CexpressionDQ)
+    '\n'           reduce using rule 71 (CexpressionDQ)
+    '"'            reduce using rule 71 (CexpressionDQ)
+
+    CexpressionDQ  go to state 375
+
+
+state 306
+
+   58 Cexpression_elem: ''' . CexpressionSQ '''
+   62                 | ''' . error
+
+    error  shift, and go to state 376
+
+    T_CEXPRESSION  reduce using rule 75 (CexpressionSQ)
+    '\n'           reduce using rule 75 (CexpressionSQ)
+    '''            reduce using rule 75 (CexpressionSQ)
+
+    CexpressionSQ  go to state 377
+
+
+state 307
+
+   60 Cexpression_elem: '[' . Cexpression_inner ']'
+   64                 | '[' . error
+
+    error  shift, and go to state 378
+
+    T_CEXPRESSION  reduce using rule 65 (Cexpression_inner)
+    T_DOLLARVAR    reduce using rule 65 (Cexpression_inner)
+    ','            reduce using rule 65 (Cexpression_inner)
+    '('            reduce using rule 65 (Cexpression_inner)
+    '\n'           reduce using rule 65 (Cexpression_inner)
+    '"'            reduce using rule 65 (Cexpression_inner)
+    '''            reduce using rule 65 (Cexpression_inner)
+    '['            reduce using rule 65 (Cexpression_inner)
+    ']'            reduce using rule 65 (Cexpression_inner)
+
+    Cexpression_inner  go to state 379
+
+
+state 308
+
+   55 Cexpression_elem: dollarvar .
+
+    $default  reduce using rule 55 (Cexpression_elem)
+
+
+state 309
+
+   53 Cexpression: Cexpression Cexpression_elem .
+
+    $default  reduce using rule 53 (Cexpression)
+
+
+state 310
+
+  164 provideds: T_PROVIDED '(' @29 Cexpression @30 . ')'
+
+    ')'  shift, and go to state 380
+
+
+state 311
+
+  255 defrviewnames: defrviewnames ',' '(' id ')' .
+
+    $default  reduce using rule 255 (defrviewnames)
+
+
+state 312
+
+  245 defuviewnames: defuviewnames ',' '(' id ')' .
+
+    $default  reduce using rule 245 (defuviewnames)
+
+
+state 313
+
+  351 ac_direct_abstract_declarator: '(' . ac_abstract_declarator ')'
+  355                              | '(' . ac_parameter_type_list ')'
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+    '('          shift, and go to state 313
+    '['          shift, and go to state 242
+    '*'          shift, and go to state 89
+
+    $default  reduce using rule 339 (ac_parameter_type_list)
+
+    id                             go to state 70
+    ac_declaration_specifiers      go to state 193
+    ac_storage_class_specifier     go to state 42
+    ac_type_specifier              go to state 43
+    ac_type_qualifier              go to state 44
+    ac_pointer                     go to state 381
+    ac_parameter_type_list         go to state 316
+    ac_parameter_list              go to state 195
+    ac_parameter_declaration       go to state 196
+    ac_abstract_declarator         go to state 317
+    ac_direct_abstract_declarator  go to state 250
+
+
+state 314
+
+  317 ac_direct_declarator: '(' ac_pointer_declarator . ')'
+
+    ')'  shift, and go to state 382
+
+
+state 315
+
+  314 ac_pointer_declarator: ac_pointer . ac_direct_declarator
+  315                      | ac_pointer . '&' ac_direct_declarator
+  348 ac_abstract_declarator: ac_pointer .
+  350                       | ac_pointer . ac_direct_abstract_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 241
+    '['   shift, and go to state 242
+    '&'   shift, and go to state 383
+    '$'   shift, and go to state 244
+
+    $default  reduce using rule 348 (ac_abstract_declarator)
+
+    id                             go to state 245
+    ac_direct_declarator           go to state 384
+    ac_direct_abstract_declarator  go to state 329
+    ac_identifier                  go to state 251
+
+
+state 316
+
+  355 ac_direct_abstract_declarator: '(' ac_parameter_type_list . ')'
+
+    ')'  shift, and go to state 385
+
+
+state 317
+
+  351 ac_direct_abstract_declarator: '(' ac_abstract_declarator . ')'
+
+    ')'  shift, and go to state 386
+
+
+state 318
+
+  353 ac_direct_abstract_declarator: '[' ac_constant_expression_option . ']'
+
+    ']'  shift, and go to state 387
+
+
+state 319
+
+  356 ac_constant_expression_option: ac_constant_expression .
+
+    $default  reduce using rule 356 (ac_constant_expression_option)
+
+
+state 320
+
+  317 ac_direct_declarator: '(' . ac_pointer_declarator ')'
+
+    '*'  shift, and go to state 89
+
+    ac_pointer_declarator  go to state 314
+    ac_pointer             go to state 388
+
+
+state 321
+
+  308 ac_declarator: '&' ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 308 (ac_declarator)
+
+
+state 322
+
+  360 ac_identifier: '$' id .
+
+    $default  reduce using rule 360 (ac_identifier)
+
+
+state 323
+
+  277 ac_default_arg_init: '=' . ac_constant_expression
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression  go to state 389
+    @39                     go to state 258
+
+
+state 324
+
+  346 ac_parameter_declaration: ac_declaration_specifiers ac_declarator ac_default_arg_init .
+
+    $default  reduce using rule 346 (ac_parameter_declaration)
+
+
+state 325
+
+  319 ac_direct_declarator: ac_direct_declarator '(' . ac_parameter_type_list ')'
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+
+    $default  reduce using rule 339 (ac_parameter_type_list)
+
+    id                          go to state 70
+    ac_declaration_specifiers   go to state 193
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    ac_parameter_type_list      go to state 390
+    ac_parameter_list           go to state 195
+    ac_parameter_declaration    go to state 196
+
+
+state 326
+
+  318 ac_direct_declarator: ac_direct_declarator '[' . ac_constant_expression_option ']'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression_option  go to state 391
+    ac_constant_expression         go to state 319
+    @39                            go to state 258
+
+
+state 327
+
+  309 ac_declarator: ac_pointer '&' . ac_direct_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 320
+    '$'   shift, and go to state 244
+
+    id                    go to state 245
+    ac_direct_declarator  go to state 392
+    ac_identifier         go to state 251
+
+
+state 328
+
+  307 ac_declarator: ac_pointer ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 307 (ac_declarator)
+
+
+state 329
+
+  350 ac_abstract_declarator: ac_pointer ac_direct_abstract_declarator .
+  352 ac_direct_abstract_declarator: ac_direct_abstract_declarator . '[' ac_constant_expression_option ']'
+  354                              | ac_direct_abstract_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 331
+    '['  shift, and go to state 332
+
+    $default  reduce using rule 350 (ac_abstract_declarator)
+
+
+state 330
+
+  347 ac_parameter_declaration: ac_declaration_specifiers ac_abstract_declarator ac_default_arg_init .
+
+    $default  reduce using rule 347 (ac_parameter_declaration)
+
+
+state 331
+
+  354 ac_direct_abstract_declarator: ac_direct_abstract_declarator '(' . ac_parameter_type_list ')'
+
+    T_ID         shift, and go to state 6
+    T_STATIC     shift, and go to state 8
+    T_AUTO       shift, and go to state 14
+    T_REGISTER   shift, and go to state 15
+    T_EXTERN     shift, and go to state 16
+    T_TYPEDEF    shift, and go to state 17
+    T_CONST      shift, and go to state 18
+    T_VOLATILE   shift, and go to state 19
+    T_UNSIGNED   shift, and go to state 20
+    T_VIRTUAL    shift, and go to state 21
+    T_DOTDOTDOT  shift, and go to state 192
+
+    $default  reduce using rule 339 (ac_parameter_type_list)
+
+    id                          go to state 70
+    ac_declaration_specifiers   go to state 193
+    ac_storage_class_specifier  go to state 42
+    ac_type_specifier           go to state 43
+    ac_type_qualifier           go to state 44
+    ac_parameter_type_list      go to state 393
+    ac_parameter_list           go to state 195
+    ac_parameter_declaration    go to state 196
+
+
+state 332
+
+  352 ac_direct_abstract_declarator: ac_direct_abstract_declarator '[' . ac_constant_expression_option ']'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression_option  go to state 394
+    ac_constant_expression         go to state 319
+    @39                            go to state 258
+
+
+state 333
+
+  272 ac_opt_base_init_list: ':' . ac_base_init_list
+
+    T_ID  shift, and go to state 6
+
+    id                 go to state 395
+    ac_base_init_list  go to state 396
+    ac_base_init       go to state 397
+
+
+state 334
+
+  267 ac_function_definition: T_CONSTRUCTOR id '(' ac_parameter_type_list ')' ac_opt_base_init_list . ac_compound_statement
+
+    error  shift, and go to state 167
+    '{'    shift, and go to state 168
+
+    MainCbody              go to state 169
+    ac_compound_statement  go to state 398
+
+
+state 335
+
+  343 ac_parameter_type_list: ac_parameter_list ',' T_DOTDOTDOT .
+
+    $default  reduce using rule 343 (ac_parameter_type_list)
+
+
+state 336
+
+  345 ac_parameter_list: ac_parameter_list ',' ac_parameter_declaration .
+
+    $default  reduce using rule 345 (ac_parameter_list)
+
+
+state 337
+
+  268 ac_function_definition: T_DESTRUCTOR opt_virtual id '(' ')' ac_compound_statement .
+
+    $default  reduce using rule 268 (ac_function_definition)
+
+
+state 338
+
+  320 ac_direct_member_declarator: id T_COLONCOLON id ac_constant_expression_list .
+  322 ac_constant_expression_list: ac_constant_expression_list . '[' ac_constant_expression ']'
+
+    '['  shift, and go to state 399
+
+    $default  reduce using rule 320 (ac_direct_member_declarator)
+
+
+state 339
+
+  280 ac_opt_member_init: '(' ac_constant_expression ')' .
+
+    $default  reduce using rule 280 (ac_opt_member_init)
+
+
+state 340
+
+   53 Cexpression: Cexpression . Cexpression_elem
+  358 ac_constant_expression: @39 Cexpression .
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 358 (ac_constant_expression)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+
+
+state 341
+
+   20 baseclass_list: baseclass_list ',' id .
+
+    $default  reduce using rule 20 (baseclass_list)
+
+
+state 342
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR id '(' ')' . ac_opt_const ac_compound_statement
+
+    T_CONST  shift, and go to state 369
+
+    $default  reduce using rule 331 (ac_opt_const)
+
+    ac_opt_const  go to state 400
+
+
+state 343
+
+   73 CexpressionDQ_elem: T_CEXPRESSION .
+
+    $default  reduce using rule 73 (CexpressionDQ_elem)
+
+
+state 344
+
+   74 CexpressionDQ_elem: '\n' .
+
+    $default  reduce using rule 74 (CexpressionDQ_elem)
+
+
+state 345
+
+  171 pattern: '"' @31 CexpressionDQ '"' .
+
+    $default  reduce using rule 171 (pattern)
+
+
+state 346
+
+   72 CexpressionDQ: CexpressionDQ CexpressionDQ_elem .
+
+    $default  reduce using rule 72 (CexpressionDQ)
+
+
+state 347
+
+  166 pattern: id '(' patternsoption ')' .
+
+    $default  reduce using rule 166 (pattern)
+
+
+state 348
+
+   29 productionblock: T_LIST id .
+
+    $default  reduce using rule 29 (productionblock)
+
+
+state 349
+
+   38 alternative: id '(' . @3 arguments @4 ')'
+   39            | id '(' . error
+
+    error  shift, and go to state 401
+
+    T_ID  reduce using rule 36 (@3)
+    ')'   reduce using rule 36 (@3)
+
+    @3  go to state 402
+
+
+state 350
+
+   44 Ccode_option: '{' . attributes_option init_option '}'
+   45             | '{' . error
+
+    error  shift, and go to state 403
+
+    T_ID  reduce using rule 46 (attributes_option)
+    '{'   reduce using rule 46 (attributes_option)
+    '}'   reduce using rule 46 (attributes_option)
+
+    attributes_option  go to state 404
+
+
+state 351
+
+   22 phylumdeclaration: id storageoption ':' @2 productionblock Ccode_option . ';'
+
+    ';'  shift, and go to state 405
+
+
+state 352
+
+   35 alternatives: alternatives error . alternative
+
+    T_ID  shift, and go to state 6
+
+    id           go to state 276
+    alternative  go to state 406
+
+
+state 353
+
+   32 alternatives: alternatives '|' . alternative
+   34             | alternatives '|' . error
+
+    error  shift, and go to state 407
+    T_ID   shift, and go to state 6
+
+    id           go to state 276
+    alternative  go to state 408
+
+
+state 354
+
+  138 rwclause: '<' useviewnames ':' . term '>'
+
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    id       go to state 411
+    integer  go to state 412
+    term     go to state 413
+
+
+state 355
+
+  214 useviewnames: useviewnames id .
+
+    $default  reduce using rule 214 (useviewnames)
+
+
+state 356
+
+  210 unparseclause: '[' error ':' . unparseitems ']'
+  211              | '[' error ':' . error
+
+    error  shift, and go to state 414
+
+    T_ID               reduce using rule 215 (unparseitems)
+    T_DOLLARVAR        reduce using rule 215 (unparseitems)
+    T_UNPBLOCKSTART    reduce using rule 215 (unparseitems)
+    T_PERCENTUVIEWVAR  reduce using rule 215 (unparseitems)
+    '{'                reduce using rule 215 (unparseitems)
+    '('                reduce using rule 215 (unparseitems)
+    '"'                reduce using rule 215 (unparseitems)
+    ']'                reduce using rule 215 (unparseitems)
+    '<'                reduce using rule 215 (unparseitems)
+
+    unparseitems  go to state 415
+
+
+state 357
+
+  208 unparseclause: '[' useviewnames ':' . unparseitems ']'
+  209              | '[' useviewnames ':' . error
+
+    error  shift, and go to state 416
+
+    T_ID               reduce using rule 215 (unparseitems)
+    T_DOLLARVAR        reduce using rule 215 (unparseitems)
+    T_UNPBLOCKSTART    reduce using rule 215 (unparseitems)
+    T_PERCENTUVIEWVAR  reduce using rule 215 (unparseitems)
+    '{'                reduce using rule 215 (unparseitems)
+    '('                reduce using rule 215 (unparseitems)
+    '"'                reduce using rule 215 (unparseitems)
+    ']'                reduce using rule 215 (unparseitems)
+    '<'                reduce using rule 215 (unparseitems)
+
+    unparseitems  go to state 417
+
+
+state 358
+
+  363 ac_compound_statement: error ';' @40 ac_compound_statement .
+
+    $default  reduce using rule 363 (ac_compound_statement)
+
+
+state 359
+
+   90 MainCbody: '{' @9 MainCBodycontinuation @10 . '}'
+
+    '}'  shift, and go to state 418
+
+
+state 360
+
+  102 Ctext: Ctext @15 . Ctext_elem
+
+    T_CNEWLINES  shift, and go to state 419
+    T_CLINE      shift, and go to state 420
+    T_DOLLARVAR  shift, and go to state 302
+    T_WITH       shift, and go to state 421
+    T_FOREACH    shift, and go to state 422
+    '{'          shift, and go to state 423
+    '\n'         shift, and go to state 424
+    '"'          shift, and go to state 425
+    '''          shift, and go to state 426
+
+    dollarvar   go to state 427
+    Cbody       go to state 428
+    Ctext_elem  go to state 429
+
+
+state 361
+
+  202 withcase: patternchains ':' . Cbody
+
+    '{'  shift, and go to state 423
+
+    Cbody  go to state 430
+
+
+state 362
+
+  142 patternchains: patternchains ',' . patternchain
+
+    $default  reduce using rule 145 (@28)
+
+    patternchain               go to state 431
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+
+
+state 363
+
+  144 patternchain: patternchain '&' . patternchainitem_lineinfo
+
+    $default  reduce using rule 145 (@28)
+
+    patternchainitem_lineinfo  go to state 432
+    @28                        go to state 296
+
+
+state 364
+
+  148 patternchainitem: '(' . patternchains ')'
+
+    $default  reduce using rule 145 (@28)
+
+    patternchains              go to state 433
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+
+
+state 365
+
+  149 patternchainitem: '$' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 434
+
+
+state 366
+
+  146 patternchainitem_lineinfo: @28 patternchainitem .
+
+    $default  reduce using rule 146 (patternchainitem_lineinfo)
+
+
+state 367
+
+  147 patternchainitem: outmostpattern .
+
+    $default  reduce using rule 147 (patternchainitem)
+
+
+state 368
+
+  201 withcases: withcases withcase .
+
+    $default  reduce using rule 201 (withcases)
+
+
+state 369
+
+  332 ac_opt_const: T_CONST .
+
+    $default  reduce using rule 332 (ac_opt_const)
+
+
+state 370
+
+  326 ac_direct_fn_declarator: ac_qualifier '(' error ')' ac_opt_const .
+
+    $default  reduce using rule 326 (ac_direct_fn_declarator)
+
+
+state 371
+
+  325 ac_direct_fn_declarator: ac_qualifier '(' ac_parameter_type_list ')' ac_opt_const .
+
+    $default  reduce using rule 325 (ac_direct_fn_declarator)
+
+
+state 372
+
+   63 Cexpression_elem: '(' error .
+
+    $default  reduce using rule 63 (Cexpression_elem)
+
+
+state 373
+
+   59 Cexpression_elem: '(' Cexpression_inner . ')'
+   66 Cexpression_inner: Cexpression_inner . Cexpression_elem_inner
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    ','            shift, and go to state 435
+    '('            shift, and go to state 303
+    ')'            shift, and go to state 436
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    dollarvar               go to state 308
+    Cexpression_elem        go to state 437
+    Cexpression_elem_inner  go to state 438
+
+
+state 374
+
+   61 Cexpression_elem: '"' error .
+
+    $default  reduce using rule 61 (Cexpression_elem)
+
+
+state 375
+
+   57 Cexpression_elem: '"' CexpressionDQ . '"'
+   72 CexpressionDQ: CexpressionDQ . CexpressionDQ_elem
+
+    T_CEXPRESSION  shift, and go to state 343
+    '\n'           shift, and go to state 344
+    '"'            shift, and go to state 439
+
+    CexpressionDQ_elem  go to state 346
+
+
+state 376
+
+   62 Cexpression_elem: ''' error .
+
+    $default  reduce using rule 62 (Cexpression_elem)
+
+
+state 377
+
+   58 Cexpression_elem: ''' CexpressionSQ . '''
+   76 CexpressionSQ: CexpressionSQ . CexpressionSQ_elem
+
+    T_CEXPRESSION  shift, and go to state 440
+    '\n'           shift, and go to state 441
+    '''            shift, and go to state 442
+
+    CexpressionSQ_elem  go to state 443
+
+
+state 378
+
+   64 Cexpression_elem: '[' error .
+
+    $default  reduce using rule 64 (Cexpression_elem)
+
+
+state 379
+
+   60 Cexpression_elem: '[' Cexpression_inner . ']'
+   66 Cexpression_inner: Cexpression_inner . Cexpression_elem_inner
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    ','            shift, and go to state 435
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+    ']'            shift, and go to state 444
+
+    dollarvar               go to state 308
+    Cexpression_elem        go to state 437
+    Cexpression_elem_inner  go to state 438
+
+
+state 380
+
+  164 provideds: T_PROVIDED '(' @29 Cexpression @30 ')' .
+
+    $default  reduce using rule 164 (provideds)
+
+
+state 381
+
+  348 ac_abstract_declarator: ac_pointer .
+  350                       | ac_pointer . ac_direct_abstract_declarator
+
+    '('  shift, and go to state 313
+    '['  shift, and go to state 242
+
+    $default  reduce using rule 348 (ac_abstract_declarator)
+
+    ac_direct_abstract_declarator  go to state 329
+
+
+state 382
+
+  317 ac_direct_declarator: '(' ac_pointer_declarator ')' .
+
+    $default  reduce using rule 317 (ac_direct_declarator)
+
+
+state 383
+
+  315 ac_pointer_declarator: ac_pointer '&' . ac_direct_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 320
+    '$'   shift, and go to state 244
+
+    id                    go to state 245
+    ac_direct_declarator  go to state 445
+    ac_identifier         go to state 251
+
+
+state 384
+
+  314 ac_pointer_declarator: ac_pointer ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 314 (ac_pointer_declarator)
+
+
+state 385
+
+  355 ac_direct_abstract_declarator: '(' ac_parameter_type_list ')' .
+
+    $default  reduce using rule 355 (ac_direct_abstract_declarator)
+
+
+state 386
+
+  351 ac_direct_abstract_declarator: '(' ac_abstract_declarator ')' .
+
+    $default  reduce using rule 351 (ac_direct_abstract_declarator)
+
+
+state 387
+
+  353 ac_direct_abstract_declarator: '[' ac_constant_expression_option ']' .
+
+    $default  reduce using rule 353 (ac_direct_abstract_declarator)
+
+
+state 388
+
+  314 ac_pointer_declarator: ac_pointer . ac_direct_declarator
+  315                      | ac_pointer . '&' ac_direct_declarator
+
+    T_ID  shift, and go to state 6
+    '('   shift, and go to state 320
+    '&'   shift, and go to state 383
+    '$'   shift, and go to state 244
+
+    id                    go to state 245
+    ac_direct_declarator  go to state 384
+    ac_identifier         go to state 251
+
+
+state 389
+
+  277 ac_default_arg_init: '=' ac_constant_expression .
+
+    $default  reduce using rule 277 (ac_default_arg_init)
+
+
+state 390
+
+  319 ac_direct_declarator: ac_direct_declarator '(' ac_parameter_type_list . ')'
+
+    ')'  shift, and go to state 446
+
+
+state 391
+
+  318 ac_direct_declarator: ac_direct_declarator '[' ac_constant_expression_option . ']'
+
+    ']'  shift, and go to state 447
+
+
+state 392
+
+  309 ac_declarator: ac_pointer '&' ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 309 (ac_declarator)
+
+
+state 393
+
+  354 ac_direct_abstract_declarator: ac_direct_abstract_declarator '(' ac_parameter_type_list . ')'
+
+    ')'  shift, and go to state 448
+
+
+state 394
+
+  352 ac_direct_abstract_declarator: ac_direct_abstract_declarator '[' ac_constant_expression_option . ']'
+
+    ']'  shift, and go to state 449
+
+
+state 395
+
+  275 ac_base_init: id . '(' ac_constant_expression_init_list ')'
+
+    '('  shift, and go to state 450
+
+
+state 396
+
+  272 ac_opt_base_init_list: ':' ac_base_init_list .
+  274 ac_base_init_list: ac_base_init_list . ',' ac_base_init
+
+    ','  shift, and go to state 451
+
+    $default  reduce using rule 272 (ac_opt_base_init_list)
+
+
+state 397
+
+  273 ac_base_init_list: ac_base_init .
+
+    $default  reduce using rule 273 (ac_base_init_list)
+
+
+state 398
+
+  267 ac_function_definition: T_CONSTRUCTOR id '(' ac_parameter_type_list ')' ac_opt_base_init_list ac_compound_statement .
+
+    $default  reduce using rule 267 (ac_function_definition)
+
+
+state 399
+
+  322 ac_constant_expression_list: ac_constant_expression_list '[' . ac_constant_expression ']'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression  go to state 452
+    @39                     go to state 258
+
+
+state 400
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR id '(' ')' ac_opt_const . ac_compound_statement
+
+    error  shift, and go to state 167
+    '{'    shift, and go to state 168
+
+    MainCbody              go to state 169
+    ac_compound_statement  go to state 453
+
+
+state 401
+
+   39 alternative: id '(' error .
+
+    $default  reduce using rule 39 (alternative)
+
+
+state 402
+
+   38 alternative: id '(' @3 . arguments @4 ')'
+
+    $default  reduce using rule 40 (arguments)
+
+    arguments  go to state 454
+
+
+state 403
+
+   45 Ccode_option: '{' error .
+
+    $default  reduce using rule 45 (Ccode_option)
+
+
+state 404
+
+   44 Ccode_option: '{' attributes_option . init_option '}'
+   47 attributes_option: attributes_option . attribute
+
+    T_ID  shift, and go to state 6
+    '{'   shift, and go to state 423
+
+    $default  reduce using rule 125 (init_option)
+
+    id           go to state 455
+    attribute    go to state 456
+    Cbody        go to state 457
+    init_option  go to state 458
+
+
+state 405
+
+   22 phylumdeclaration: id storageoption ':' @2 productionblock Ccode_option ';' .
+
+    $default  reduce using rule 22 (phylumdeclaration)
+
+
+state 406
+
+   35 alternatives: alternatives error alternative .
+
+    $default  reduce using rule 35 (alternatives)
+
+
+state 407
+
+   34 alternatives: alternatives '|' error .
+
+    $default  reduce using rule 34 (alternatives)
+
+
+state 408
+
+   32 alternatives: alternatives '|' alternative .
+
+    $default  reduce using rule 32 (alternatives)
+
+
+state 409
+
+  190 term: '"' . @33 CexpressionDQ '"'
+
+    $default  reduce using rule 189 (@33)
+
+    @33  go to state 459
+
+
+state 410
+
+  188 term: ''' . @32 CexpressionSQ '''
+
+    $default  reduce using rule 187 (@32)
+
+    @32  go to state 460
+
+
+state 411
+
+  181 term: id .
+  182     | id . '(' termsoption ')'
+
+    '('  shift, and go to state 461
+
+    $default  reduce using rule 181 (term)
+
+
+state 412
+
+  191 term: integer .
+
+    $default  reduce using rule 191 (term)
+
+
+state 413
+
+  138 rwclause: '<' useviewnames ':' term . '>'
+  183 term: term . T_ARROW id '(' termsoption ')'
+  184     | term . '.' id '(' termsoption ')'
+  185     | term . T_ARROW id
+  186     | term . '.' id
+
+    T_ARROW  shift, and go to state 462
+    '>'      shift, and go to state 463
+    '.'      shift, and go to state 464
+
+
+state 414
+
+  211 unparseclause: '[' error ':' error .
+
+    $default  reduce using rule 211 (unparseclause)
+
+
+state 415
+
+  210 unparseclause: '[' error ':' unparseitems . ']'
+  216 unparseitems: unparseitems . unparseitem
+
+    T_PERCENTUVIEWVAR  shift, and go to state 465
+    ']'                shift, and go to state 466
+    '<'                shift, and go to state 467
+
+    $default  reduce using rule 365 (languageoption)
+
+    unparseitem     go to state 468
+    languageoption  go to state 469
+
+
+state 416
+
+  209 unparseclause: '[' useviewnames ':' error .
+
+    $default  reduce using rule 209 (unparseclause)
+
+
+state 417
+
+  208 unparseclause: '[' useviewnames ':' unparseitems . ']'
+  216 unparseitems: unparseitems . unparseitem
+
+    T_PERCENTUVIEWVAR  shift, and go to state 465
+    ']'                shift, and go to state 470
+    '<'                shift, and go to state 467
+
+    $default  reduce using rule 365 (languageoption)
+
+    unparseitem     go to state 468
+    languageoption  go to state 469
+
+
+state 418
+
+   90 MainCbody: '{' @9 MainCBodycontinuation @10 '}' .
+
+    $default  reduce using rule 90 (MainCbody)
+
+
+state 419
+
+  106 Ctext_elem: T_CNEWLINES .
+
+    $default  reduce using rule 106 (Ctext_elem)
+
+
+state 420
+
+  103 Ctext_elem: T_CLINE .
+
+    $default  reduce using rule 103 (Ctext_elem)
+
+
+state 421
+
+  117 Ctext_elem: T_WITH . @19 '(' @20 withCexpressions @21 ')' '{' withcases '}'
+
+    $default  reduce using rule 114 (@19)
+
+    @19  go to state 471
+
+
+state 422
+
+  113 Ctext_elem: T_FOREACH . @18 foreach_continuation
+
+    $default  reduce using rule 112 (@18)
+
+    @18  go to state 472
+
+
+state 423
+
+   99 Cbody: '{' . @13 Ctext @14 '}'
+
+    $default  reduce using rule 97 (@13)
+
+    @13  go to state 473
+
+
+state 424
+
+  105 Ctext_elem: '\n' .
+
+    $default  reduce using rule 105 (Ctext_elem)
+
+
+state 425
+
+  108 Ctext_elem: '"' . @16 CexpressionDQ '"'
+
+    $default  reduce using rule 107 (@16)
+
+    @16  go to state 474
+
+
+state 426
+
+  110 Ctext_elem: ''' . @17 CexpressionSQ '''
+
+    $default  reduce using rule 109 (@17)
+
+    @17  go to state 475
+
+
+state 427
+
+  104 Ctext_elem: dollarvar .
+
+    $default  reduce using rule 104 (Ctext_elem)
+
+
+state 428
+
+  111 Ctext_elem: Cbody .
+
+    $default  reduce using rule 111 (Ctext_elem)
+
+
+state 429
+
+  102 Ctext: Ctext @15 Ctext_elem .
+
+    $default  reduce using rule 102 (Ctext)
+
+
+state 430
+
+  202 withcase: patternchains ':' Cbody .
+
+    $default  reduce using rule 202 (withcase)
+
+
+state 431
+
+  142 patternchains: patternchains ',' patternchain .
+  144 patternchain: patternchain . '&' patternchainitem_lineinfo
+
+    '&'  shift, and go to state 363
+
+    $default  reduce using rule 142 (patternchains)
+
+
+state 432
+
+  144 patternchain: patternchain '&' patternchainitem_lineinfo .
+
+    $default  reduce using rule 144 (patternchain)
+
+
+state 433
+
+  142 patternchains: patternchains . ',' patternchain
+  148 patternchainitem: '(' patternchains . ')'
+
+    ','  shift, and go to state 362
+    ')'  shift, and go to state 476
+
+
+state 434
+
+  149 patternchainitem: '$' id .
+
+    $default  reduce using rule 149 (patternchainitem)
+
+
+state 435
+
+   68 Cexpression_elem_inner: ',' .
+
+    $default  reduce using rule 68 (Cexpression_elem_inner)
+
+
+state 436
+
+   59 Cexpression_elem: '(' Cexpression_inner ')' .
+
+    $default  reduce using rule 59 (Cexpression_elem)
+
+
+state 437
+
+   67 Cexpression_elem_inner: Cexpression_elem .
+
+    $default  reduce using rule 67 (Cexpression_elem_inner)
+
+
+state 438
+
+   66 Cexpression_inner: Cexpression_inner Cexpression_elem_inner .
+
+    $default  reduce using rule 66 (Cexpression_inner)
+
+
+state 439
+
+   57 Cexpression_elem: '"' CexpressionDQ '"' .
+
+    $default  reduce using rule 57 (Cexpression_elem)
+
+
+state 440
+
+   77 CexpressionSQ_elem: T_CEXPRESSION .
+
+    $default  reduce using rule 77 (CexpressionSQ_elem)
+
+
+state 441
+
+   78 CexpressionSQ_elem: '\n' .
+
+    $default  reduce using rule 78 (CexpressionSQ_elem)
+
+
+state 442
+
+   58 Cexpression_elem: ''' CexpressionSQ ''' .
+
+    $default  reduce using rule 58 (Cexpression_elem)
+
+
+state 443
+
+   76 CexpressionSQ: CexpressionSQ CexpressionSQ_elem .
+
+    $default  reduce using rule 76 (CexpressionSQ)
+
+
+state 444
+
+   60 Cexpression_elem: '[' Cexpression_inner ']' .
+
+    $default  reduce using rule 60 (Cexpression_elem)
+
+
+state 445
+
+  315 ac_pointer_declarator: ac_pointer '&' ac_direct_declarator .
+  318 ac_direct_declarator: ac_direct_declarator . '[' ac_constant_expression_option ']'
+  319                     | ac_direct_declarator . '(' ac_parameter_type_list ')'
+
+    '('  shift, and go to state 325
+    '['  shift, and go to state 326
+
+    $default  reduce using rule 315 (ac_pointer_declarator)
+
+
+state 446
+
+  319 ac_direct_declarator: ac_direct_declarator '(' ac_parameter_type_list ')' .
+
+    $default  reduce using rule 319 (ac_direct_declarator)
+
+
+state 447
+
+  318 ac_direct_declarator: ac_direct_declarator '[' ac_constant_expression_option ']' .
+
+    $default  reduce using rule 318 (ac_direct_declarator)
+
+
+state 448
+
+  354 ac_direct_abstract_declarator: ac_direct_abstract_declarator '(' ac_parameter_type_list ')' .
+
+    $default  reduce using rule 354 (ac_direct_abstract_declarator)
+
+
+state 449
+
+  352 ac_direct_abstract_declarator: ac_direct_abstract_declarator '[' ac_constant_expression_option ']' .
+
+    $default  reduce using rule 352 (ac_direct_abstract_declarator)
+
+
+state 450
+
+  275 ac_base_init: id '(' . ac_constant_expression_init_list ')'
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression_init_list  go to state 477
+    ac_constant_expression            go to state 478
+    @39                               go to state 258
+
+
+state 451
+
+  274 ac_base_init_list: ac_base_init_list ',' . ac_base_init
+
+    T_ID  shift, and go to state 6
+
+    id            go to state 395
+    ac_base_init  go to state 479
+
+
+state 452
+
+  322 ac_constant_expression_list: ac_constant_expression_list '[' ac_constant_expression . ']'
+
+    ']'  shift, and go to state 480
+
+
+state 453
+
+  266 ac_function_definition: id T_COLONCOLON T_OPERATOR id '(' ')' ac_opt_const ac_compound_statement .
+
+    $default  reduce using rule 266 (ac_function_definition)
+
+
+state 454
+
+   38 alternative: id '(' @3 arguments . @4 ')'
+   41 arguments: arguments . id
+   42          | arguments . T_ID ':' id
+
+    T_ID  shift, and go to state 481
+
+    $default  reduce using rule 37 (@4)
+
+    id  go to state 482
+    @4  go to state 483
+
+
+state 455
+
+   48 attribute: id . id attribute_init_option ';'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 484
+
+
+state 456
+
+   47 attributes_option: attributes_option attribute .
+
+    $default  reduce using rule 47 (attributes_option)
+
+
+state 457
+
+  126 init_option: Cbody .
+
+    $default  reduce using rule 126 (init_option)
+
+
+state 458
+
+   44 Ccode_option: '{' attributes_option init_option . '}'
+
+    '}'  shift, and go to state 485
+
+
+state 459
+
+  190 term: '"' @33 . CexpressionDQ '"'
+
+    $default  reduce using rule 71 (CexpressionDQ)
+
+    CexpressionDQ  go to state 486
+
+
+state 460
+
+  188 term: ''' @32 . CexpressionSQ '''
+
+    $default  reduce using rule 75 (CexpressionSQ)
+
+    CexpressionSQ  go to state 487
+
+
+state 461
+
+  182 term: id '(' . termsoption ')'
+
+    error  shift, and go to state 488
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    ')'  reduce using rule 192 (termsoption)
+
+    id           go to state 411
+    integer      go to state 412
+    term         go to state 489
+    termsoption  go to state 490
+    terms        go to state 491
+
+
+state 462
+
+  183 term: term T_ARROW . id '(' termsoption ')'
+  185     | term T_ARROW . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 492
+
+
+state 463
+
+  138 rwclause: '<' useviewnames ':' term '>' .
+
+    $default  reduce using rule 138 (rwclause)
+
+
+state 464
+
+  184 term: term '.' . id '(' termsoption ')'
+  186     | term '.' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 493
+
+
+state 465
+
+  225 unparseitem: T_PERCENTUVIEWVAR . id id @37 Cexpression @38 ';'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 494
+
+
+state 466
+
+  210 unparseclause: '[' error ':' unparseitems ']' .
+
+    $default  reduce using rule 210 (unparseclause)
+
+
+state 467
+
+  364 languageoption: '<' . languageoptions '>' ':'
+
+    error  shift, and go to state 495
+    T_ID   shift, and go to state 6
+
+    id               go to state 496
+    languageoptions  go to state 497
+
+
+state 468
+
+  216 unparseitems: unparseitems unparseitem .
+
+    $default  reduce using rule 216 (unparseitems)
+
+
+state 469
+
+  219 unparseitem: languageoption . '"' @35 CexpressionDQ quote_or_error @36 viewnameoption
+  220            | languageoption . unpsubterm viewnameoption
+  221            | languageoption . Cbody
+  222            | languageoption . T_UNPBLOCKSTART unparseitems T_UNPBLOCKEND
+
+    T_ID             shift, and go to state 6
+    T_DOLLARVAR      shift, and go to state 302
+    T_UNPBLOCKSTART  shift, and go to state 498
+    '{'              shift, and go to state 423
+    '('              shift, and go to state 499
+    '"'              shift, and go to state 500
+
+    dollarvar   go to state 501
+    id          go to state 502
+    Cbody       go to state 503
+    unpsubterm  go to state 504
+
+
+state 470
+
+  208 unparseclause: '[' useviewnames ':' unparseitems ']' .
+
+    $default  reduce using rule 208 (unparseclause)
+
+
+state 471
+
+  117 Ctext_elem: T_WITH @19 . '(' @20 withCexpressions @21 ')' '{' withcases '}'
+
+    '('  shift, and go to state 505
+
+
+state 472
+
+  113 Ctext_elem: T_FOREACH @18 . foreach_continuation
+
+    '('  shift, and go to state 506
+
+    foreach_continuation  go to state 507
+
+
+state 473
+
+   99 Cbody: '{' @13 . Ctext @14 '}'
+
+    $default  reduce using rule 100 (Ctext)
+
+    Ctext  go to state 508
+
+
+state 474
+
+  108 Ctext_elem: '"' @16 . CexpressionDQ '"'
+
+    $default  reduce using rule 71 (CexpressionDQ)
+
+    CexpressionDQ  go to state 509
+
+
+state 475
+
+  110 Ctext_elem: ''' @17 . CexpressionSQ '''
+
+    $default  reduce using rule 75 (CexpressionSQ)
+
+    CexpressionSQ  go to state 510
+
+
+state 476
+
+  148 patternchainitem: '(' patternchains ')' .
+
+    $default  reduce using rule 148 (patternchainitem)
+
+
+state 477
+
+  275 ac_base_init: id '(' ac_constant_expression_init_list . ')'
+  324 ac_constant_expression_init_list: ac_constant_expression_init_list . ',' ac_constant_expression
+
+    ','  shift, and go to state 511
+    ')'  shift, and go to state 512
+
+
+state 478
+
+  323 ac_constant_expression_init_list: ac_constant_expression .
+
+    $default  reduce using rule 323 (ac_constant_expression_init_list)
+
+
+state 479
+
+  274 ac_base_init_list: ac_base_init_list ',' ac_base_init .
+
+    $default  reduce using rule 274 (ac_base_init_list)
+
+
+state 480
+
+  322 ac_constant_expression_list: ac_constant_expression_list '[' ac_constant_expression ']' .
+
+    $default  reduce using rule 322 (ac_constant_expression_list)
+
+
+state 481
+
+    2 id: T_ID .
+   42 arguments: arguments T_ID . ':' id
+
+    ':'  shift, and go to state 513
+
+    $default  reduce using rule 2 (id)
+
+
+state 482
+
+   41 arguments: arguments id .
+
+    $default  reduce using rule 41 (arguments)
+
+
+state 483
+
+   38 alternative: id '(' @3 arguments @4 . ')'
+
+    ')'  shift, and go to state 514
+
+
+state 484
+
+   48 attribute: id id . attribute_init_option ';'
+
+    '='  shift, and go to state 515
+
+    $default  reduce using rule 49 (attribute_init_option)
+
+    attribute_init_option  go to state 516
+
+
+state 485
+
+   44 Ccode_option: '{' attributes_option init_option '}' .
+
+    $default  reduce using rule 44 (Ccode_option)
+
+
+state 486
+
+   72 CexpressionDQ: CexpressionDQ . CexpressionDQ_elem
+  190 term: '"' @33 CexpressionDQ . '"'
+
+    T_CEXPRESSION  shift, and go to state 343
+    '\n'           shift, and go to state 344
+    '"'            shift, and go to state 517
+
+    CexpressionDQ_elem  go to state 346
+
+
+state 487
+
+   76 CexpressionSQ: CexpressionSQ . CexpressionSQ_elem
+  188 term: ''' @32 CexpressionSQ . '''
+
+    T_CEXPRESSION  shift, and go to state 440
+    '\n'           shift, and go to state 441
+    '''            shift, and go to state 518
+
+    CexpressionSQ_elem  go to state 443
+
+
+state 488
+
+  196 terms: error .
+
+    $default  reduce using rule 196 (terms)
+
+
+state 489
+
+  183 term: term . T_ARROW id '(' termsoption ')'
+  184     | term . '.' id '(' termsoption ')'
+  185     | term . T_ARROW id
+  186     | term . '.' id
+  194 terms: term .
+
+    T_ARROW  shift, and go to state 462
+    '.'      shift, and go to state 464
+
+    $default  reduce using rule 194 (terms)
+
+
+state 490
+
+  182 term: id '(' termsoption . ')'
+
+    ')'  shift, and go to state 519
+
+
+state 491
+
+  193 termsoption: terms .
+  195 terms: terms . ',' term
+  197      | terms . error
+  198      | terms . ',' error
+  199      | terms . error term
+
+    error  shift, and go to state 520
+    ','    shift, and go to state 521
+
+    ')'  reduce using rule 193 (termsoption)
+
+
+state 492
+
+  183 term: term T_ARROW id . '(' termsoption ')'
+  185     | term T_ARROW id .
+
+    '('  shift, and go to state 522
+
+    $default  reduce using rule 185 (term)
+
+
+state 493
+
+  184 term: term '.' id . '(' termsoption ')'
+  186     | term '.' id .
+
+    '('  shift, and go to state 523
+
+    $default  reduce using rule 186 (term)
+
+
+state 494
+
+  225 unparseitem: T_PERCENTUVIEWVAR id . id @37 Cexpression @38 ';'
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 524
+
+
+state 495
+
+  368 languageoptions: error .
+
+    $default  reduce using rule 368 (languageoptions)
+
+
+state 496
+
+  366 languageoptions: id .
+
+    $default  reduce using rule 366 (languageoptions)
+
+
+state 497
+
+  364 languageoption: '<' languageoptions . '>' ':'
+  367 languageoptions: languageoptions . ',' id
+  369                | languageoptions . error
+  370                | languageoptions . ',' error
+  371                | languageoptions . error id
+
+    error  shift, and go to state 525
+    ','    shift, and go to state 526
+    '>'    shift, and go to state 527
+
+
+state 498
+
+  222 unparseitem: languageoption T_UNPBLOCKSTART . unparseitems T_UNPBLOCKEND
+
+    $default  reduce using rule 215 (unparseitems)
+
+    unparseitems  go to state 528
+
+
+state 499
+
+  230 unpsubterm: '(' . id ')' id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 529
+
+
+state 500
+
+  219 unparseitem: languageoption '"' . @35 CexpressionDQ quote_or_error @36 viewnameoption
+
+    $default  reduce using rule 217 (@35)
+
+    @35  go to state 530
+
+
+state 501
+
+  227 unpsubterm: dollarvar .
+  229           | dollarvar . unpattributes
+
+    T_ARROW  shift, and go to state 531
+
+    $default  reduce using rule 227 (unpsubterm)
+
+    unpattributes  go to state 532
+    unpattribute   go to state 533
+
+
+state 502
+
+  226 unpsubterm: id .
+  228           | id . unpattributes
+
+    T_ARROW  shift, and go to state 531
+
+    $default  reduce using rule 226 (unpsubterm)
+
+    unpattributes  go to state 534
+    unpattribute   go to state 533
+
+
+state 503
+
+  221 unparseitem: languageoption Cbody .
+
+    $default  reduce using rule 221 (unparseitem)
+
+
+state 504
+
+  220 unparseitem: languageoption unpsubterm . viewnameoption
+
+    ':'  shift, and go to state 535
+
+    $default  reduce using rule 235 (viewnameoption)
+
+    viewnameoption  go to state 536
+
+
+state 505
+
+  117 Ctext_elem: T_WITH @19 '(' . @20 withCexpressions @21 ')' '{' withcases '}'
+
+    $default  reduce using rule 115 (@20)
+
+    @20  go to state 537
+
+
+state 506
+
+  120 foreach_continuation: '(' . patternchain ';' @22 idCexpressions ')' MainCbodyinC @23 foreach_end_continuation
+
+    $default  reduce using rule 145 (@28)
+
+    patternchain               go to state 538
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+
+
+state 507
+
+  113 Ctext_elem: T_FOREACH @18 foreach_continuation .
+
+    $default  reduce using rule 113 (Ctext_elem)
+
+
+state 508
+
+   99 Cbody: '{' @13 Ctext . @14 '}'
+  102 Ctext: Ctext . @15 Ctext_elem
+
+    '}'       reduce using rule 98 (@14)
+    $default  reduce using rule 101 (@15)
+
+    @14  go to state 539
+    @15  go to state 360
+
+
+state 509
+
+   72 CexpressionDQ: CexpressionDQ . CexpressionDQ_elem
+  108 Ctext_elem: '"' @16 CexpressionDQ . '"'
+
+    T_CEXPRESSION  shift, and go to state 343
+    '\n'           shift, and go to state 344
+    '"'            shift, and go to state 540
+
+    CexpressionDQ_elem  go to state 346
+
+
+state 510
+
+   76 CexpressionSQ: CexpressionSQ . CexpressionSQ_elem
+  110 Ctext_elem: ''' @17 CexpressionSQ . '''
+
+    T_CEXPRESSION  shift, and go to state 440
+    '\n'           shift, and go to state 441
+    '''            shift, and go to state 541
+
+    CexpressionSQ_elem  go to state 443
+
+
+state 511
+
+  324 ac_constant_expression_init_list: ac_constant_expression_init_list ',' . ac_constant_expression
+
+    $default  reduce using rule 357 (@39)
+
+    ac_constant_expression  go to state 542
+    @39                     go to state 258
+
+
+state 512
+
+  275 ac_base_init: id '(' ac_constant_expression_init_list ')' .
+
+    $default  reduce using rule 275 (ac_base_init)
+
+
+state 513
+
+   42 arguments: arguments T_ID ':' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 543
+
+
+state 514
+
+   38 alternative: id '(' @3 arguments @4 ')' .
+
+    $default  reduce using rule 38 (alternative)
+
+
+state 515
+
+   51 attribute_init_option: '=' . @5 Cexpression
+
+    $default  reduce using rule 50 (@5)
+
+    @5  go to state 544
+
+
+state 516
+
+   48 attribute: id id attribute_init_option . ';'
+
+    ';'  shift, and go to state 545
+
+
+state 517
+
+  190 term: '"' @33 CexpressionDQ '"' .
+
+    $default  reduce using rule 190 (term)
+
+
+state 518
+
+  188 term: ''' @32 CexpressionSQ ''' .
+
+    $default  reduce using rule 188 (term)
+
+
+state 519
+
+  182 term: id '(' termsoption ')' .
+
+    $default  reduce using rule 182 (term)
+
+
+state 520
+
+  197 terms: terms error .
+  199      | terms error . term
+
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    $default  reduce using rule 197 (terms)
+
+    id       go to state 411
+    integer  go to state 412
+    term     go to state 546
+
+
+state 521
+
+  195 terms: terms ',' . term
+  198      | terms ',' . error
+
+    error  shift, and go to state 547
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    id       go to state 411
+    integer  go to state 412
+    term     go to state 548
+
+
+state 522
+
+  183 term: term T_ARROW id '(' . termsoption ')'
+
+    error  shift, and go to state 488
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    ')'  reduce using rule 192 (termsoption)
+
+    id           go to state 411
+    integer      go to state 412
+    term         go to state 489
+    termsoption  go to state 549
+    terms        go to state 491
+
+
+state 523
+
+  184 term: term '.' id '(' . termsoption ')'
+
+    error  shift, and go to state 488
+    T_ID   shift, and go to state 6
+    T_INT  shift, and go to state 144
+    '"'    shift, and go to state 409
+    '''    shift, and go to state 410
+
+    ')'  reduce using rule 192 (termsoption)
+
+    id           go to state 411
+    integer      go to state 412
+    term         go to state 489
+    termsoption  go to state 550
+    terms        go to state 491
+
+
+state 524
+
+  225 unparseitem: T_PERCENTUVIEWVAR id id . @37 Cexpression @38 ';'
+
+    $default  reduce using rule 223 (@37)
+
+    @37  go to state 551
+
+
+state 525
+
+  369 languageoptions: languageoptions error .
+  371                | languageoptions error . id
+
+    T_ID  shift, and go to state 6
+
+    $default  reduce using rule 369 (languageoptions)
+
+    id  go to state 552
+
+
+state 526
+
+  367 languageoptions: languageoptions ',' . id
+  370                | languageoptions ',' . error
+
+    error  shift, and go to state 553
+    T_ID   shift, and go to state 6
+
+    id  go to state 554
+
+
+state 527
+
+  364 languageoption: '<' languageoptions '>' . ':'
+
+    ':'  shift, and go to state 555
+
+
+state 528
+
+  216 unparseitems: unparseitems . unparseitem
+  222 unparseitem: languageoption T_UNPBLOCKSTART unparseitems . T_UNPBLOCKEND
+
+    T_UNPBLOCKEND      shift, and go to state 556
+    T_PERCENTUVIEWVAR  shift, and go to state 465
+    '<'                shift, and go to state 467
+
+    $default  reduce using rule 365 (languageoption)
+
+    unparseitem     go to state 468
+    languageoption  go to state 469
+
+
+state 529
+
+  230 unpsubterm: '(' id . ')' id
+
+    ')'  shift, and go to state 557
+
+
+state 530
+
+  219 unparseitem: languageoption '"' @35 . CexpressionDQ quote_or_error @36 viewnameoption
+
+    $default  reduce using rule 71 (CexpressionDQ)
+
+    CexpressionDQ  go to state 558
+
+
+state 531
+
+  233 unpattribute: T_ARROW . id
+  234             | T_ARROW . error
+
+    error  shift, and go to state 559
+    T_ID   shift, and go to state 6
+
+    id  go to state 560
+
+
+state 532
+
+  229 unpsubterm: dollarvar unpattributes .
+  232 unpattributes: unpattributes . unpattribute
+
+    T_ARROW  shift, and go to state 531
+
+    $default  reduce using rule 229 (unpsubterm)
+
+    unpattribute  go to state 561
+
+
+state 533
+
+  231 unpattributes: unpattribute .
+
+    $default  reduce using rule 231 (unpattributes)
+
+
+state 534
+
+  228 unpsubterm: id unpattributes .
+  232 unpattributes: unpattributes . unpattribute
+
+    T_ARROW  shift, and go to state 531
+
+    $default  reduce using rule 228 (unpsubterm)
+
+    unpattribute  go to state 561
+
+
+state 535
+
+  236 viewnameoption: ':' . id
+  237               | ':' . error
+
+    error  shift, and go to state 562
+    T_ID   shift, and go to state 6
+
+    id  go to state 563
+
+
+state 536
+
+  220 unparseitem: languageoption unpsubterm viewnameoption .
+
+    $default  reduce using rule 220 (unparseitem)
+
+
+state 537
+
+  117 Ctext_elem: T_WITH @19 '(' @20 . withCexpressions @21 ')' '{' withcases '}'
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression       go to state 564
+    withCexpression   go to state 565
+    withCexpressions  go to state 566
+
+
+state 538
+
+  120 foreach_continuation: '(' patternchain . ';' @22 idCexpressions ')' MainCbodyinC @23 foreach_end_continuation
+  144 patternchain: patternchain . '&' patternchainitem_lineinfo
+
+    ';'  shift, and go to state 567
+    '&'  shift, and go to state 363
+
+
+state 539
+
+   99 Cbody: '{' @13 Ctext @14 . '}'
+
+    '}'  shift, and go to state 568
+
+
+state 540
+
+  108 Ctext_elem: '"' @16 CexpressionDQ '"' .
+
+    $default  reduce using rule 108 (Ctext_elem)
+
+
+state 541
+
+  110 Ctext_elem: ''' @17 CexpressionSQ ''' .
+
+    $default  reduce using rule 110 (Ctext_elem)
+
+
+state 542
+
+  324 ac_constant_expression_init_list: ac_constant_expression_init_list ',' ac_constant_expression .
+
+    $default  reduce using rule 324 (ac_constant_expression_init_list)
+
+
+state 543
+
+   42 arguments: arguments T_ID ':' id .
+
+    $default  reduce using rule 42 (arguments)
+
+
+state 544
+
+   51 attribute_init_option: '=' @5 . Cexpression
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression  go to state 569
+
+
+state 545
+
+   48 attribute: id id attribute_init_option ';' .
+
+    $default  reduce using rule 48 (attribute)
+
+
+state 546
+
+  183 term: term . T_ARROW id '(' termsoption ')'
+  184     | term . '.' id '(' termsoption ')'
+  185     | term . T_ARROW id
+  186     | term . '.' id
+  199 terms: terms error term .
+
+    T_ARROW  shift, and go to state 462
+    '.'      shift, and go to state 464
+
+    $default  reduce using rule 199 (terms)
+
+
+state 547
+
+  198 terms: terms ',' error .
+
+    $default  reduce using rule 198 (terms)
+
+
+state 548
+
+  183 term: term . T_ARROW id '(' termsoption ')'
+  184     | term . '.' id '(' termsoption ')'
+  185     | term . T_ARROW id
+  186     | term . '.' id
+  195 terms: terms ',' term .
+
+    T_ARROW  shift, and go to state 462
+    '.'      shift, and go to state 464
+
+    $default  reduce using rule 195 (terms)
+
+
+state 549
+
+  183 term: term T_ARROW id '(' termsoption . ')'
+
+    ')'  shift, and go to state 570
+
+
+state 550
+
+  184 term: term '.' id '(' termsoption . ')'
+
+    ')'  shift, and go to state 571
+
+
+state 551
+
+  225 unparseitem: T_PERCENTUVIEWVAR id id @37 . Cexpression @38 ';'
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression  go to state 572
+
+
+state 552
+
+  371 languageoptions: languageoptions error id .
+
+    $default  reduce using rule 371 (languageoptions)
+
+
+state 553
+
+  370 languageoptions: languageoptions ',' error .
+
+    $default  reduce using rule 370 (languageoptions)
+
+
+state 554
+
+  367 languageoptions: languageoptions ',' id .
+
+    $default  reduce using rule 367 (languageoptions)
+
+
+state 555
+
+  364 languageoption: '<' languageoptions '>' ':' .
+
+    $default  reduce using rule 364 (languageoption)
+
+
+state 556
+
+  222 unparseitem: languageoption T_UNPBLOCKSTART unparseitems T_UNPBLOCKEND .
+
+    $default  reduce using rule 222 (unparseitem)
+
+
+state 557
+
+  230 unpsubterm: '(' id ')' . id
+
+    T_ID  shift, and go to state 6
+
+    id  go to state 573
+
+
+state 558
+
+   72 CexpressionDQ: CexpressionDQ . CexpressionDQ_elem
+  219 unparseitem: languageoption '"' @35 CexpressionDQ . quote_or_error @36 viewnameoption
+
+    error          shift, and go to state 574
+    T_CEXPRESSION  shift, and go to state 343
+    '\n'           shift, and go to state 344
+    '"'            shift, and go to state 575
+
+    quote_or_error      go to state 576
+    CexpressionDQ_elem  go to state 346
+
+
+state 559
+
+  234 unpattribute: T_ARROW error .
+
+    $default  reduce using rule 234 (unpattribute)
+
+
+state 560
+
+  233 unpattribute: T_ARROW id .
+
+    $default  reduce using rule 233 (unpattribute)
+
+
+state 561
+
+  232 unpattributes: unpattributes unpattribute .
+
+    $default  reduce using rule 232 (unpattributes)
+
+
+state 562
+
+  237 viewnameoption: ':' error .
+
+    $default  reduce using rule 237 (viewnameoption)
+
+
+state 563
+
+  236 viewnameoption: ':' id .
+
+    $default  reduce using rule 236 (viewnameoption)
+
+
+state 564
+
+   53 Cexpression: Cexpression . Cexpression_elem
+   84 withCexpression: Cexpression .
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 84 (withCexpression)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+
+
+state 565
+
+   85 withCexpressions: withCexpression .
+
+    $default  reduce using rule 85 (withCexpressions)
+
+
+state 566
+
+   87 withCexpressions: withCexpressions . ',' @8 withCexpression
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions . @21 ')' '{' withcases '}'
+
+    ','  shift, and go to state 577
+
+    $default  reduce using rule 116 (@21)
+
+    @21  go to state 578
+
+
+state 567
+
+  120 foreach_continuation: '(' patternchain ';' . @22 idCexpressions ')' MainCbodyinC @23 foreach_end_continuation
+
+    $default  reduce using rule 118 (@22)
+
+    @22  go to state 579
+
+
+state 568
+
+   99 Cbody: '{' @13 Ctext @14 '}' .
+
+    $default  reduce using rule 99 (Cbody)
+
+
+state 569
+
+   51 attribute_init_option: '=' @5 Cexpression .
+   53 Cexpression: Cexpression . Cexpression_elem
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 51 (attribute_init_option)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+
+
+state 570
+
+  183 term: term T_ARROW id '(' termsoption ')' .
+
+    $default  reduce using rule 183 (term)
+
+
+state 571
+
+  184 term: term '.' id '(' termsoption ')' .
+
+    $default  reduce using rule 184 (term)
+
+
+state 572
+
+   53 Cexpression: Cexpression . Cexpression_elem
+  225 unparseitem: T_PERCENTUVIEWVAR id id @37 Cexpression . @38 ';'
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 224 (@38)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+    @38               go to state 580
+
+
+state 573
+
+  230 unpsubterm: '(' id ')' id .
+
+    $default  reduce using rule 230 (unpsubterm)
+
+
+state 574
+
+   70 quote_or_error: error .
+
+    $default  reduce using rule 70 (quote_or_error)
+
+
+state 575
+
+   69 quote_or_error: '"' .
+
+    $default  reduce using rule 69 (quote_or_error)
+
+
+state 576
+
+  219 unparseitem: languageoption '"' @35 CexpressionDQ quote_or_error . @36 viewnameoption
+
+    $default  reduce using rule 218 (@36)
+
+    @36  go to state 581
+
+
+state 577
+
+   87 withCexpressions: withCexpressions ',' . @8 withCexpression
+
+    $default  reduce using rule 86 (@8)
+
+    @8  go to state 582
+
+
+state 578
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 . ')' '{' withcases '}'
+
+    ')'  shift, and go to state 583
+
+
+state 579
+
+  120 foreach_continuation: '(' patternchain ';' @22 . idCexpressions ')' MainCbodyinC @23 foreach_end_continuation
+
+    T_ID  shift, and go to state 6
+
+    id              go to state 584
+    idCexpressions  go to state 585
+    idCexpression   go to state 586
+
+
+state 580
+
+  225 unparseitem: T_PERCENTUVIEWVAR id id @37 Cexpression @38 . ';'
+
+    ';'  shift, and go to state 587
+
+
+state 581
+
+  219 unparseitem: languageoption '"' @35 CexpressionDQ quote_or_error @36 . viewnameoption
+
+    ':'  shift, and go to state 535
+
+    $default  reduce using rule 235 (viewnameoption)
+
+    viewnameoption  go to state 588
+
+
+state 582
+
+   87 withCexpressions: withCexpressions ',' @8 . withCexpression
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression      go to state 564
+    withCexpression  go to state 589
+
+
+state 583
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 ')' . '{' withcases '}'
+
+    '{'  shift, and go to state 590
+
+
+state 584
+
+   83 idCexpression: id . @6 Cexpression @7
+
+    $default  reduce using rule 81 (@6)
+
+    @6  go to state 591
+
+
+state 585
+
+   80 idCexpressions: idCexpressions . ',' idCexpression
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions . ')' MainCbodyinC @23 foreach_end_continuation
+
+    ','  shift, and go to state 592
+    ')'  shift, and go to state 593
+
+
+state 586
+
+   79 idCexpressions: idCexpression .
+
+    $default  reduce using rule 79 (idCexpressions)
+
+
+state 587
+
+  225 unparseitem: T_PERCENTUVIEWVAR id id @37 Cexpression @38 ';' .
+
+    $default  reduce using rule 225 (unparseitem)
+
+
+state 588
+
+  219 unparseitem: languageoption '"' @35 CexpressionDQ quote_or_error @36 viewnameoption .
+
+    $default  reduce using rule 219 (unparseitem)
+
+
+state 589
+
+   87 withCexpressions: withCexpressions ',' @8 withCexpression .
+
+    $default  reduce using rule 87 (withCexpressions)
+
+
+state 590
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 ')' '{' . withcases '}'
+
+    $default  reduce using rule 145 (@28)
+
+    patternchains              go to state 293
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+    withcases                  go to state 594
+    withcase                   go to state 298
+
+
+state 591
+
+   83 idCexpression: id @6 . Cexpression @7
+
+    $default  reduce using rule 52 (Cexpression)
+
+    Cexpression  go to state 595
+
+
+state 592
+
+   80 idCexpressions: idCexpressions ',' . idCexpression
+
+    T_ID  shift, and go to state 6
+
+    id             go to state 584
+    idCexpression  go to state 596
+
+
+state 593
+
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions ')' . MainCbodyinC @23 foreach_end_continuation
+
+    '{'  shift, and go to state 597
+
+    MainCbodyinC  go to state 598
+
+
+state 594
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 ')' '{' withcases . '}'
+  201 withcases: withcases . withcase
+
+    '}'  shift, and go to state 599
+
+    $default  reduce using rule 145 (@28)
+
+    patternchains              go to state 293
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+    withcase                   go to state 368
+
+
+state 595
+
+   53 Cexpression: Cexpression . Cexpression_elem
+   83 idCexpression: id @6 Cexpression . @7
+
+    T_CEXPRESSION  shift, and go to state 301
+    T_DOLLARVAR    shift, and go to state 302
+    '('            shift, and go to state 303
+    '\n'           shift, and go to state 304
+    '"'            shift, and go to state 305
+    '''            shift, and go to state 306
+    '['            shift, and go to state 307
+
+    $default  reduce using rule 82 (@7)
+
+    dollarvar         go to state 308
+    Cexpression_elem  go to state 309
+    @7                go to state 600
+
+
+state 596
+
+   80 idCexpressions: idCexpressions ',' idCexpression .
+
+    $default  reduce using rule 80 (idCexpressions)
+
+
+state 597
+
+   93 MainCbodyinC: '{' . @11 MainCBodycontinuation @12 '}'
+
+    $default  reduce using rule 91 (@11)
+
+    @11  go to state 601
+
+
+state 598
+
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions ')' MainCbodyinC . @23 foreach_end_continuation
+
+    $default  reduce using rule 119 (@23)
+
+    @23  go to state 602
+
+
+state 599
+
+  117 Ctext_elem: T_WITH @19 '(' @20 withCexpressions @21 ')' '{' withcases '}' .
+
+    $default  reduce using rule 117 (Ctext_elem)
+
+
+state 600
+
+   83 idCexpression: id @6 Cexpression @7 .
+
+    $default  reduce using rule 83 (idCexpression)
+
+
+state 601
+
+   93 MainCbodyinC: '{' @11 . MainCBodycontinuation @12 '}'
+
+    error  shift, and go to state 290
+
+    T_ID         reduce using rule 145 (@28)
+    T_CNEWLINES  reduce using rule 100 (Ctext)
+    T_CLINE      reduce using rule 100 (Ctext)
+    T_DOLLARVAR  reduce using rule 100 (Ctext)
+    T_WITH       reduce using rule 100 (Ctext)
+    T_FOREACH    reduce using rule 100 (Ctext)
+    T_DEFAULT    reduce using rule 145 (@28)
+    '{'          reduce using rule 100 (Ctext)
+    '}'          reduce using rule 100 (Ctext)
+    '('          reduce using rule 145 (@28)
+    '\n'         reduce using rule 100 (Ctext)
+    '"'          reduce using rule 100 (Ctext)
+    '''          reduce using rule 100 (Ctext)
+    '$'          reduce using rule 145 (@28)
+    '*'          reduce using rule 145 (@28)
+
+    MainCBodycontinuation      go to state 603
+    Ctext                      go to state 292
+    patternchains              go to state 293
+    patternchain               go to state 294
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+    withcases                  go to state 297
+    withcase                   go to state 298
+
+
+state 602
+
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions ')' MainCbodyinC @23 . foreach_end_continuation
+
+    T_FOREACH_AFTER  shift, and go to state 604
+
+    $default  reduce using rule 121 (foreach_end_continuation)
+
+    foreach_end_continuation  go to state 605
+
+
+state 603
+
+   93 MainCbodyinC: '{' @11 MainCBodycontinuation . @12 '}'
+
+    $default  reduce using rule 92 (@12)
+
+    @12  go to state 606
+
+
+state 604
+
+  124 foreach_end_continuation: T_FOREACH_AFTER . @24 '(' patternchain @25 ')' MainCbodyinC
+
+    $default  reduce using rule 122 (@24)
+
+    @24  go to state 607
+
+
+state 605
+
+  120 foreach_continuation: '(' patternchain ';' @22 idCexpressions ')' MainCbodyinC @23 foreach_end_continuation .
+
+    $default  reduce using rule 120 (foreach_continuation)
+
+
+state 606
+
+   93 MainCbodyinC: '{' @11 MainCBodycontinuation @12 . '}'
+
+    '}'  shift, and go to state 608
+
+
+state 607
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 . '(' patternchain @25 ')' MainCbodyinC
+
+    '('  shift, and go to state 609
+
+
+state 608
+
+   93 MainCbodyinC: '{' @11 MainCBodycontinuation @12 '}' .
+
+    $default  reduce using rule 93 (MainCbodyinC)
+
+
+state 609
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' . patternchain @25 ')' MainCbodyinC
+
+    $default  reduce using rule 145 (@28)
+
+    patternchain               go to state 610
+    patternchainitem_lineinfo  go to state 295
+    @28                        go to state 296
+
+
+state 610
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' patternchain . @25 ')' MainCbodyinC
+  144 patternchain: patternchain . '&' patternchainitem_lineinfo
+
+    '&'  shift, and go to state 363
+
+    $default  reduce using rule 123 (@25)
+
+    @25  go to state 611
+
+
+state 611
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' patternchain @25 . ')' MainCbodyinC
+
+    ')'  shift, and go to state 612
+
+
+state 612
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' patternchain @25 ')' . MainCbodyinC
+
+    '{'  shift, and go to state 597
+
+    MainCbodyinC  go to state 613
+
+
+state 613
+
+  124 foreach_end_continuation: T_FOREACH_AFTER @24 '(' patternchain @25 ')' MainCbodyinC .
+
+    $default  reduce using rule 124 (foreach_end_continuation)

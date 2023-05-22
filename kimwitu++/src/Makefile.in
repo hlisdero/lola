@@ -1,0 +1,384 @@
+# 
+# The Termprocessor Kimwitu++
+#
+# Copyright (C) 1991 University of Twente, Dept TIOS.
+# Copyright (C) 1998-2007 Humboldt-University of Berlin, Institute of Informatics
+# All rights reserved.
+#  
+# Kimwitu++ is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Kimwitu++ is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Kimwitu++; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# 
+#  
+# This is the makefile for kc++.
+#
+# Usage: make boot [ GENDIR=yourgendirpath ]
+#		will bootstrap kc++ in directory GENDIR, by default set to ./Gen
+#
+# Usage: make s1 [ GENDIR=yourgendirpath ]
+#		will make a new stage one kc++ in directory GENDIR, by default set to ./Gen.*,
+#		using an existent stage zero version, that should be in the PATH and be called
+#		either kc++ or kc++_s0
+#		s2 and s3 are also available (and require kc++_s1 and kc++_s2, respectively)
+#
+# Usage: make check [ GENDIR=yourgendirpath ]
+#		checks whether stage 2 and stage 3 are identical
+#
+# Further targets are available, see below
+
+RCSMAKEID := '"@(\#)$$Id: Makefile.in,v 1.42 2007-04-19 08:32:59 piefel Exp $$"'
+
+ROOT := @srcdir@
+ifeq "$(ROOT)" "."
+ROOT := $(shell pwd)
+endif
+ifeq "$(patsubst ../%,..,$(ROOT))" ".."
+ROOT := $(shell pwd)/$(ROOT)
+endif
+ARCH := @arch@
+SHELL := /bin/sh
+@SET_MAKE@
+GENDIR := Gen
+MAKERUNDIR := $(shell pwd)
+
+EXE :=
+ifeq "$(ARCH)" "cygwin"
+SHELL := /bin/bash
+EXE :=.exe
+endif
+
+# If this defines KC_USE_STAT then fstat will be used in main.k 
+USESTATDEFINE =  KC_USE_STAT
+
+OLD = $(KIMWITUVERSION)
+NEW = $(KIMWITUVERSION)
+PATCHPREFIX = kc-patch.
+PATCHFILE = "$(PATCHPREFIX)$(OLD)to$(NEW)"
+
+# List the source/object etc files.. Note the use of the
+# macro substitution to have to list only once the .k files and the
+# files that are generated from them...
+# We patch the K__SOURCE variable during the recursive make call
+# to patch in the path to the source directory
+# note that the ORDER of the .k files is IMPORTANT (for cat / KC)
+
+K__GENS  = unpk.X k.X rk.X
+K__FILES := \
+	abs.X \
+	main.X \
+	parse.X \
+	error.X \
+	occur.X \
+	util.X \
+	gen.X \
+	gutil.X \
+	pat.X
+K__SOURCE := $(K__FILES:X=k)
+K__OBJS   := $(K__GENS:X=o)  $(K__FILES:X=o)
+K_CFILES  := $(K__GENS:X=cc) $(K__FILES:X=cc)
+K_HFILES  := $(K__GENS:X=h)  $(K__FILES:X=h)  yystype.h
+CONFIGFILE := config.h
+ERRMSG_PY_FILE := errmsg.py
+EXPLORER_C_INTERFACE := python.cc
+
+K_SOURCE := $(K__SOURCE)
+L_SOURCE := kimwl.l
+M_SOURCE := Makefile
+Y_SOURCE := kimwy.y
+PY_SOURCE := $(ERRMSG_PY_FILE)
+K_OBJS   := $(K__OBJS)
+LY_CFILES := kimwy.cc kimwl.cc
+LY_HFILES := kimwy.h
+LY_TFILE := kimwy.output
+LY_OBJS := $(LY_CFILES:cc=o)
+GETOPT_CFILES := getopt.h getopt.c getopt1.c
+GETOPT_OBJS := getopt.o getopt1.o
+DF_HFILES := defs.h defs.hh
+ERRMSG_CC_FILE := errmsg.inc
+
+SOURCE := \
+ $(K_SOURCE) \
+ $(L_SOURCE) \
+ $(M_SOURCE) \
+ $(Y_SOURCE) \
+ $(PY_SOURCE)
+OBJS = $(LY_OBJS) $(K_OBJS) @PYOBJS@
+CFILES := $(LY_CFILES) $(K_CFILES)
+
+# defining values for DEFINEs in defs.h
+KIMWITUVERSION := @PACKAGE_VERSION@
+KIMWITUCOPYRIGHTDEFINE := @(\#)$$Author
+KIMWITUCOPYRIGHTDEFINE := KIMWITUCOPYRIGHT '"$(KIMWITUCOPYRIGHTDEFINE): Kimwitu++ version $(KIMWITUVERSION) (C) 1998-2007 Humboldt-University of Berlin $$"'
+MAKEFILEVERSIONDEFINE := RCSMAKEID $(RCSMAKEID)
+KIMWITUVERSIONSTRINGDEFINE := KIMWITUVERSIONSTRING '"$(KIMWITUVERSION)"'
+KIMWITURELEASEDEFINE := KIMWITURELEASE '"@(\#)RELEASE VERSION $(KIMWITUVERSION)"'
+KIMWITUVERSIONMAJORDEFINE := METAKIMWITUVERSIONMAJOR $(shell echo @PACKAGE_VERSION@ | cut -d. -f1)
+KIMWITUVERSIONMINORDEFINE := METAKIMWITUVERSIONMINOR $(shell echo @PACKAGE_VERSION@ | cut -d. -f2)
+KIMWITUVERSIONMICRODEFINE := METAKIMWITUVERSIONMICRO $(shell echo @PACKAGE_VERSION@ | cut -d. -f3)
+
+#
+# setting of (architecture dependend) flags etc.
+#
+
+# processors to use
+CXX := @CXX@
+CC := @CC@
+ifeq "$(ARCH)" "solaris"
+  ifeq "$(PURIFY)" "y"
+  override PURIFY := purify -chain-length="8"
+  endif
+endif
+BISON := bison
+LEX := flex -l
+KC := $(shell kc++_s0 --version 2> /dev/null || echo no)
+ifeq ($(KC),no)
+KC := kc++$(EXE)
+else
+KC := kc++_s0$(EXE)
+endif
+
+# yacc flags: we need the -v flag for better error reporting
+YFLAGS := --verbose
+# Next macro enables the use of better error messages with bison.
+# To use it, also use bison as your parser generator
+YCFLAGS += -DYYERROR_VERBOSE
+
+#LFLAGS = -d
+KFLAGS :=--no-csgio --no-printdot --no-hashtables --yystype
+INCLUDES := -I.
+YCFLAGS += -DYYDEBUG=1
+#YCFLAGS += -DMYLEXDEBUG
+#YCFLAGS += -DYYDEBUG=1 -DMYLEXDEBUG
+DEFINES := @hashset@
+CXXFLAGS := $(UNIVERSAL_BINARY) -g
+CXXFLAGSOPT := $(UNIVERSAL_BINARY) -O2
+CFLAGS := $(CXXFLAGS) -DHAVE_CONFIG_H -I.
+CFLAGSOPT := $(CXXFLAGSOPT) -DHAVE_CONFIG_H -I.
+
+ifneq (,$(findstring ++,$(CXX)))
+# -ansi should be here but it's buggy (and should be called -iso anyway)
+CXXFLAGS := $(CXXFLAGS) -Wall -Wno-unused -Wno-uninitialized
+CXXFLAGSOPT := $(CXXFLAGSOPT) -Os
+  ifeq "$(WARN)" "y"
+    CXXFLAGS += -Wold-style-cast -Weffc++
+  endif
+endif
+override CXXFLAGS += $(INCLUDES) $(DEFINES)
+LIBS := @PYLIBS@
+PYCFLAGS := @PYCFLAGS@
+LINT_CFLAGS := $(INCLUDES) $(GENDEFINES)
+MALLOC_LDFLAGS := $(ANY_ARCH_MALLOC_LDFLAGS)
+
+BOOTSTRAPTARGET := kc++$(EXE)
+L1TARGET := kc++_s1$(EXE)
+L2TARGET := kc++_s2$(EXE)
+L3TARGET := kc++_s3$(EXE)
+
+#
+# The Main targets & rules
+#
+
+.PHONY: all boot s1 s2 s3 check cfromk
+
+all: s1
+
+boot:
+	@echo "Making $(GENDIR)/$(BOOTSTRAPTARGET)..."
+	if test ! -d $(GENDIR); then mkdir $(GENDIR); fi
+	cd $(GENDIR); \
+	for f in $(CFILES) $(K_HFILES) $(LY_HFILES) $(ERRMSG_CC_FILE) $(LY_TFILE); \
+		do cp -p $(ROOT)/Gen.boot/$${f} $${f}; done ; \
+	for f in $(K__SOURCE) $(ERRMSG_PY_FILE) $(GETOPT_CFILES) $(Y_SOURCE) $(L_SOURCE); \
+		do cp -p $(ROOT)/$${f} $${f}; done; \
+	cp $(MAKERUNDIR)/$(CONFIGFILE) $(CONFIGFILE); \
+	touch tstamp.kc ; \
+	$(MAKE) -e -f $(MAKERUNDIR)/Makefile \
+		MAKERUNDIR=$(MAKERUNDIR) \
+		CFLAGS="$(CFLAGSOPT)" \
+		CXXFLAGS="$(CXXFLAGSOPT)" \
+		$(BOOTSTRAPTARGET)
+	strip $(GENDIR)/$(BOOTSTRAPTARGET)
+
+s1:
+	@echo "Making $(GENDIR)/$(L1TARGET)..."
+	if test ! -d $(GENDIR); then mkdir $(GENDIR); fi
+	cd $(GENDIR); \
+	for f in $(K__SOURCE) $(ERRMSG_PY_FILE) $(Y_SOURCE) $(L_SOURCE) \
+		$(EXPLORER_C_INTERFACE) $(GETOPT_CFILES); \
+	do ln -sf $(ROOT)/$${f} $${f}; done; \
+	cp $(MAKERUNDIR)/$(CONFIGFILE) $(CONFIGFILE); \
+	$(MAKE) -e -f $(MAKERUNDIR)/Makefile \
+		MAKERUNDIR=$(MAKERUNDIR) \
+		$(L1TARGET)
+
+s2 s3:
+	@echo "Making $(GENDIR)/$(L$(subst s3,3,$(subst s2,2,$@))TARGET)..."
+	if test ! -d $(GENDIR); then mkdir $(GENDIR); fi
+	cd $(GENDIR); \
+	rm -f tstamp.kc; \
+	$(MAKE) -e -f $(MAKERUNDIR)/Makefile \
+		MAKERUNDIR=$(MAKERUNDIR) \
+		KC:=./kc++_s$(subst s3,2,$(subst s2,1,$@))$(EXE) \
+		$(L$(subst s3,3,$(subst s2,2,$@))TARGET)
+
+
+check:
+	@diff $(GENDIR)/$(L2TARGET) $(GENDIR)/$(L3TARGET) && echo Binary files $(GENDIR)/$(L2TARGET) $(GENDIR)/$(L3TARGET) are identical \(check passed\)
+
+# running KC++ on the .k files
+tstamp.kc: $(K_SOURCE)
+	$(KC) --no-linedirec $(KFLAGS) $(K_SOURCE)
+	touch tstamp.kc
+
+$(K_CFILES) $(K_HFILES): tstamp.kc
+
+$(BOOTSTRAPTARGET) $(L1TARGET) $(L2TARGET) $(L3TARGET): $(OBJS) $(GETOPT_OBJS)
+	$(PURIFY) $(CXX) $(CXXFLAGS) $(OBJS) $(GETOPT_OBJS) $(MALLOC_LDFLAGS) -o $@ $(LIBS)
+
+# we use a python script to extract verbose error messages from a
+# *.output file generated by bison.
+# NOTE: this only works with bison-generated *.output files
+kimwy.cc kimwy.h $(ERRMSG_CC_FILE): kimwy.y $(ERRMSG_PY_FILE)
+	LC_ALL=C $(BISON) $(YFLAGS) --defines $<
+	mv kimwy.tab.c kimwy.cc
+	mv kimwy.tab.h kimwy.h
+	python $(ERRMSG_PY_FILE) $(LY_TFILE) $(ERRMSG_CC_FILE)
+
+kimwl.cc: kimwl.l
+	$(LEX) $(LFLAGS) $<
+	mv lex.yy.c kimwl.cc
+
+
+# We collect a number of definitions in the defs.h file
+# we do this for two reasons:
+#  1) we don't clutter the CXX command line with lots of -D flags
+#  2) we can put the file in the distribution, for non-unix platforms
+#
+defs.h: $(MAKERUNDIR)/Makefile
+	@echo "Writing defs.h"
+	@echo "/* this file is automatically generated by 'make'; do not edit! */" > $@
+	@echo "#ifndef DEFS_H" >> $@
+	@echo '# define ' $(MAKEFILEVERSIONDEFINE) >> $@
+	@echo '# define ' $(KIMWITUCOPYRIGHTDEFINE) >> $@
+	@echo '# define ' $(USESTATDEFINE) >> $@
+	@echo '# define ' $(KIMWITURELEASEDEFINE) >> $@
+	@echo '# define ' $(KIMWITUVERSIONSTRINGDEFINE) >> $@
+	@echo '# define ' $(KIMWITUVERSIONMAJORDEFINE) >> $@
+	@echo '# define ' $(KIMWITUVERSIONMINORDEFINE) >> $@
+	@echo '# define ' $(KIMWITUVERSIONMICRODEFINE) >> $@
+	@echo '#endif /* DEFS_H */' >> $@
+
+# making copies to prevent unnessary compilation
+kimwy.hh: kimwy.h
+	-cmp -s $@ $? || cp $? $@
+defs.hh: defs.h
+	-cmp -s $@ $? || cp $? $@
+
+kimwy.o: kimwy.cc kimwy.h $(ERRMSG_CC_FILE)
+	$(CXX) $(CXXFLAGS) $(YCFLAGS) -c $<
+
+python.o: python.cc python.h k.h
+	$(CXX) $(CXXFLAGS) $(PYCFLAGS) -c $<
+
+
+#
+# special (maintenance) targets
+#
+# Usage: make clean
+#		clean up
+#
+# Usage: make veryclean
+#    or  make distclean
+#		leaves nothing behind...
+#
+# Usage: make patch [OLD=oldversion] [NEW=newversion]
+#		generates a patch file from version OLD to version NEW
+#		(CVS tags, both defaulting to current version)
+#
+# Usage: make distribution
+#		prepares directory for distribution, called
+#		from higher level make
+# 
+
+.PHONY: clean distclean veryclean version patch depend distribution
+clean:
+	rm -f $(GENDIR)/*.o $(GENDIR)/$(BOOTSTRAPTARGET) $(GENDIR)/$(L1TARGET)* $(GENDIR)/$(L2TARGET) $(GENDIR)/$(L3TARGET)
+distclean:
+	-mv -f Gen.boot _Gen.boot
+	-rm -rf $(GENDIR) Gen.*
+	-mv -f _Gen.boot Gen.boot
+veryclean: distclean
+	@echo Anything left?
+
+version:
+	@echo $(KIMWITUVERSION)
+patch:
+	-@echo "This patch patches Kimwitu from patchlevel $(OLD) to $(NEW).\n\
+To apply, cd to the kc-distr/src directory, and execute\n\
+\n\
+	patch < $(PATCHFILE)\n\
+\n\
+To rebuild kc++:\n\
+- Make sure you have a working kc++ in your PATH\n\
+- Remove the kc-distr/src/Gen.* directory if existing (make veryclean)\n\
+- execute 'make new' to build the new kc as kc-distr/Gen.*/kc.new\n\
+\n\
+\n\
+Prereq: $(OLD)\n\
+" > $(PATCHFILE); \
+	for f in $(SOURCE); do \
+	echo "cvs diff -c -r$(OLD) -r$(NEW) $${f} |egrep -v '^No differences' >> $(PATCHFILE)" ; \
+	echo "Index: $${f}" >> $(PATCHFILE); \
+	cvs diff -c -r$(OLD) -r$(NEW) $${f} |egrep -v '^No differences' >> $(PATCHFILE) ; \
+	done
+
+depend:
+	@echo "Making $(GENDIR)/$(TARGET)..."
+	olddir=$(pwd); \
+	cd $(GENDIR); \
+	rm -f $${olddir}/depend; \
+	for f in $(CFILES); \
+	do $(CXX) -MM $(INCLUDES) $${f} >> $${olddir}/depend; done
+
+distribution:
+	cd $(GENDIR); \
+	for f in $(K__SOURCE) $(ERRMSG_PY_FILE) $(Y_SOURCE) $(L_SOURCE); \
+		do ln -sf $(ROOT)/$${f} $${f}; done; \
+	$(MAKE) -e -f $(MAKERUNDIR)/Makefile \
+		MAKERUNDIR=$(MAKERUNDIR) \
+		tstamp.kc $(ERRMSG_CC_FILE) kimwl.cc defs.h
+	@echo C++ files created
+
+$(OBJS): k.h 
+# defs.h(h) contains a couple of definitions, to be included in main.cc
+main.o: defs.hh
+unpk.o: defs.hh
+
+# dependencies from here generated using the depend target
+# slightly edited:
+#   to change kimwy.h into kimwy.hh
+#   to remove the stdio include from the kimwl.o dependency
+kimwy.o : kimwy.cc k.h error.h occur.h parse.h yystype.h
+kimwl.o : kimwl.cc k.h error.h occur.h kimwy.hh yystype.h
+abs.o : abs.cc k.h error.h occur.h abs.h 
+main.o : main.cc k.h error.h occur.h unpk.h gen.h gutil.h main.h 
+parse.o : parse.cc k.h error.h occur.h util.h parse.h 
+error.o : error.cc k.h error.h occur.h unpk.h gen.h error.h 
+defocc.o : defocc.cc k.h error.h occur.h
+util.o : util.cc k.h error.h occur.h parse.h util.h 
+gen.o : gen.cc k.h error.h occur.h gen.h 
+gutil.o : gutil.cc k.h error.h occur.h util.h unpk.h gen.h gutil.h 
+pat.o : pat.cc k.h error.h occur.h util.h pat.h 
+unpk.o : unpk.cc k.h error.h occur.h unpk.h gen.h util.h \
+   parse.h pat.h gutil.h 
+k.o : k.cc k.h error.h occur.h  
