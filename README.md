@@ -24,6 +24,7 @@ In case the download links stop working, it is crucial that the model checker is
 
 3. Install LoLA compiling it from the source. Follow the instructions in the [README](./lola/README).
 The code needs to be modified for the compilation to work. See the corresponding [commit](https://github.com/hlisdero/lola/commit/fe5323ccf1584622517fbeef1feeaa743494fa3b).
+The compilation with a modern C++ compiler produces numerous warnings. To the best of our knowledge, they do not affect the suitability of the resulting binary.
 
 These steps were tested on a Fedora Linux 38 (Workstation Edition) 64-bit machine.
 
