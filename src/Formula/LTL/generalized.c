@@ -42,9 +42,10 @@ extern int tl_verbose, tl_stats, tl_simp_diff, tl_simp_fly, tl_fjtofj,
 extern char **sym_table;
 
 GState *gstack, *gremoved, *gstates, * *init;
-GScc *scc_stack;
+GScc *gscc_stack;
+extern int rank;
 int init_size = 0, gstate_id = 1, gstate_count = 0, gtrans_count = 0;
-int *fin, *final, rank, scc_id, scc_size, *bad_scc;
+int *fin, *final, scc_id, scc_size, *bad_scc;
 
 void print_generalized();
 
@@ -327,8 +328,8 @@ int gdfs(GState *s)
     scc->gstate = s;
     scc->rank = rank;
     scc->theta = rank++;
-    scc->nxt = scc_stack;
-    scc_stack = scc;
+    scc->nxt = gscc_stack;
+    gscc_stack = scc;
 
     s->incoming = 1;
 
@@ -341,7 +342,7 @@ int gdfs(GState *s)
         }
         else
         {
-            for (c = scc_stack->nxt; c != 0; c = c->nxt)
+            for (c = gscc_stack->nxt; c != 0; c = c->nxt)
                 if (c->gstate == t->to)
                 {
                     scc->theta = min(scc->theta, c->rank);
@@ -351,13 +352,13 @@ int gdfs(GState *s)
     }
     if (scc->rank == scc->theta)
     {
-        while (scc_stack != scc)
+        while (gscc_stack != scc)
         {
-            scc_stack->gstate->incoming = scc_id;
-            scc_stack = scc_stack->nxt;
+            gscc_stack->gstate->incoming = scc_id;
+            gscc_stack = gscc_stack->nxt;
         }
         scc->gstate->incoming = scc_id++;
-        scc_stack = scc->nxt;
+        gscc_stack = scc->nxt;
     }
     return scc->theta;
 }
@@ -368,7 +369,7 @@ void simplify_gscc()
     GTrans *t;
     int i, **scc_final;
     rank = 1;
-    scc_stack = 0;
+    gscc_stack = 0;
     scc_id = 1;
 
     if (gstates == gstates->nxt)
